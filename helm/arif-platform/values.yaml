@@ -1,0 +1,282 @@
+replicaCount: 2
+
+image:
+  registry: docker.io
+  repository: arif-platform
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+global:
+  environment: production
+  domain: arif-platform.com
+  
+sqlserver:
+  enabled: true
+  acceptEula:
+    value: "Y"
+  sapassword: "ArifPlatform2024!"
+  edition:
+    value: Developer
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: standard
+
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: standard
+
+apiGateway:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: arif-platform/api-gateway
+    tag: latest
+  service:
+    type: LoadBalancer
+    port: 5000
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    hosts:
+      - host: api.arif-platform.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: arif-platform-tls
+        hosts:
+          - api.arif-platform.com
+
+microservices:
+  authService:
+    enabled: true
+    replicaCount: 2
+    image:
+      repository: arif-platform/auth-service
+      tag: latest
+    service:
+      port: 5001
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+    
+  aiOrchestration:
+    enabled: true
+    replicaCount: 2
+    image:
+      repository: arif-platform/ai-orchestration
+      tag: latest
+    service:
+      port: 5002
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+    
+  chatbotRuntime:
+    enabled: true
+    replicaCount: 3
+    image:
+      repository: arif-platform/chatbot-runtime
+      tag: latest
+    service:
+      port: 5003
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+    
+  workflowEngine:
+    enabled: true
+    replicaCount: 2
+    image:
+      repository: arif-platform/workflow-engine
+      tag: latest
+    service:
+      port: 5004
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+    
+  integrationGateway:
+    enabled: true
+    replicaCount: 2
+    image:
+      repository: arif-platform/integration-gateway
+      tag: latest
+    service:
+      port: 5005
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+    
+  analytics:
+    enabled: true
+    replicaCount: 2
+    image:
+      repository: arif-platform/analytics
+      tag: latest
+    service:
+      port: 5006
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+    
+  subscription:
+    enabled: true
+    replicaCount: 2
+    image:
+      repository: arif-platform/subscription
+      tag: latest
+    service:
+      port: 5007
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+    
+  notification:
+    enabled: true
+    replicaCount: 2
+    image:
+      repository: arif-platform/notification
+      tag: latest
+    service:
+      port: 5008
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+    
+  liveAgent:
+    enabled: true
+    replicaCount: 2
+    image:
+      repository: arif-platform/live-agent
+      tag: latest
+    service:
+      port: 5009
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+  grafana:
+    enabled: true
+  jaeger:
+    enabled: true
+
+security:
+  jwt:
+    secretKey: "your-super-secret-jwt-key-change-in-production-min-32-chars"
+    issuer: "ArifPlatform"
+    audience: "ArifPlatformUsers"
+  
+integrations:
+  openai:
+    apiKey: ""
+  azure:
+    openai:
+      endpoint: ""
+      apiKey: ""
+  twilio:
+    accountSid: ""
+    authToken: ""
+  facebook:
+    appId: ""
+    appSecret: ""
+  slack:
+    botToken: ""
+  salesforce:
+    clientId: ""
+    clientSecret: ""
+  hubspot:
+    apiKey: ""
+  stripe:
+    secretKey: ""
+    publishableKey: ""
+    webhookSecret: ""
+  smtp:
+    host: ""
+    port: 587
+    username: ""
+    password: ""
+  firebase:
+    serverKey: ""
+    senderId: ""

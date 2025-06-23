@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arif-auth-service
+  namespace: arif-platform
+  labels:
+    app: arif-auth-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: arif-auth-service
+  template:
+    metadata:
+      labels:
+        app: arif-auth-service
+    spec:
+      containers:
+      - name: auth-service
+        image: arif-platform/auth-service:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ASPNETCORE_URLS
+          value: "http://+:5000"
+        envFrom:
+        - configMapRef:
+            name: arif-platform-config
+        - secretRef:
+            name: arif-platform-secrets
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arif-auth-service
+  namespace: arif-platform
+  labels:
+    app: arif-auth-service
+spec:
+  selector:
+    app: arif-auth-service
+  ports:
+  - port: 5001
+    targetPort: 5000
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: arif-auth-service-hpa
+  namespace: arif-platform
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: arif-auth-service
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

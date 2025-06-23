@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.17" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.0" />
+
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Arif.Platform.IntegrationGateway.Domain\Arif.Platform.IntegrationGateway.Domain.csproj" />
+    <ProjectReference Include="..\Arif.Platform.IntegrationGateway.Infrastructure\Arif.Platform.IntegrationGateway.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\shared\Arif.Platform.Shared.Domain\Arif.Platform.Shared.Domain.csproj" />
+    <ProjectReference Include="..\..\..\shared\Arif.Platform.Shared.Infrastructure\Arif.Platform.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\shared\Arif.Platform.Shared.Common\Arif.Platform.Shared.Common.csproj" />
+  </ItemGroup>
+
+
+</Project>

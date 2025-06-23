@@ -1,0 +1,95 @@
+# Multi-stage Dockerfile for Arif .NET Backend Services
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 5000
+EXPOSE 5001
+
+# Install curl for health checks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy solution file
+COPY ["backend/Arif.Platform.sln", "./"]
+
+# Copy all project files for dependency resolution
+COPY ["backend/src/gateways/Arif.Platform.ApiGateway/Arif.Platform.ApiGateway.csproj", "src/gateways/Arif.Platform.ApiGateway/"]
+COPY ["backend/src/shared/Arif.Platform.Shared.Domain/Arif.Platform.Shared.Domain.csproj", "src/shared/Arif.Platform.Shared.Domain/"]
+COPY ["backend/src/shared/Arif.Platform.Shared.Infrastructure/Arif.Platform.Shared.Infrastructure.csproj", "src/shared/Arif.Platform.Shared.Infrastructure/"]
+COPY ["backend/src/shared/Arif.Platform.Shared.Common/Arif.Platform.Shared.Common.csproj", "src/shared/Arif.Platform.Shared.Common/"]
+
+# Copy all service project files
+COPY ["backend/src/services/Authentication/Arif.Platform.Authentication.Api/Arif.Platform.Authentication.Api.csproj", "src/services/Authentication/Arif.Platform.Authentication.Api/"]
+COPY ["backend/src/services/Authentication/Arif.Platform.Authentication.Domain/Arif.Platform.Authentication.Domain.csproj", "src/services/Authentication/Arif.Platform.Authentication.Domain/"]
+COPY ["backend/src/services/Authentication/Arif.Platform.Authentication.Infrastructure/Arif.Platform.Authentication.Infrastructure.csproj", "src/services/Authentication/Arif.Platform.Authentication.Infrastructure/"]
+
+COPY ["backend/src/services/AIOrchestration/Arif.Platform.AIOrchestration.Api/Arif.Platform.AIOrchestration.Api.csproj", "src/services/AIOrchestration/Arif.Platform.AIOrchestration.Api/"]
+COPY ["backend/src/services/AIOrchestration/Arif.Platform.AIOrchestration.Domain/Arif.Platform.AIOrchestration.Domain.csproj", "src/services/AIOrchestration/Arif.Platform.AIOrchestration.Domain/"]
+COPY ["backend/src/services/AIOrchestration/Arif.Platform.AIOrchestration.Infrastructure/Arif.Platform.AIOrchestration.Infrastructure.csproj", "src/services/AIOrchestration/Arif.Platform.AIOrchestration.Infrastructure/"]
+
+COPY ["backend/src/services/ChatbotRuntime/Arif.Platform.ChatbotRuntime.Api/Arif.Platform.ChatbotRuntime.Api.csproj", "src/services/ChatbotRuntime/Arif.Platform.ChatbotRuntime.Api/"]
+COPY ["backend/src/services/ChatbotRuntime/Arif.Platform.ChatbotRuntime.Domain/Arif.Platform.ChatbotRuntime.Domain.csproj", "src/services/ChatbotRuntime/Arif.Platform.ChatbotRuntime.Domain/"]
+COPY ["backend/src/services/ChatbotRuntime/Arif.Platform.ChatbotRuntime.Infrastructure/Arif.Platform.ChatbotRuntime.Infrastructure.csproj", "src/services/ChatbotRuntime/Arif.Platform.ChatbotRuntime.Infrastructure/"]
+
+COPY ["backend/src/services/WorkflowEngine/Arif.Platform.WorkflowEngine.Api/Arif.Platform.WorkflowEngine.Api.csproj", "src/services/WorkflowEngine/Arif.Platform.WorkflowEngine.Api/"]
+COPY ["backend/src/services/WorkflowEngine/Arif.Platform.WorkflowEngine.Domain/Arif.Platform.WorkflowEngine.Domain.csproj", "src/services/WorkflowEngine/Arif.Platform.WorkflowEngine.Domain/"]
+COPY ["backend/src/services/WorkflowEngine/Arif.Platform.WorkflowEngine.Infrastructure/Arif.Platform.WorkflowEngine.Infrastructure.csproj", "src/services/WorkflowEngine/Arif.Platform.WorkflowEngine.Infrastructure/"]
+
+COPY ["backend/src/services/IntegrationGateway/Arif.Platform.IntegrationGateway.Api/Arif.Platform.IntegrationGateway.Api.csproj", "src/services/IntegrationGateway/Arif.Platform.IntegrationGateway.Api/"]
+COPY ["backend/src/services/IntegrationGateway/Arif.Platform.IntegrationGateway.Domain/Arif.Platform.IntegrationGateway.Domain.csproj", "src/services/IntegrationGateway/Arif.Platform.IntegrationGateway.Domain/"]
+COPY ["backend/src/services/IntegrationGateway/Arif.Platform.IntegrationGateway.Infrastructure/Arif.Platform.IntegrationGateway.Infrastructure.csproj", "src/services/IntegrationGateway/Arif.Platform.IntegrationGateway.Infrastructure/"]
+
+COPY ["backend/src/services/Analytics/Arif.Platform.Analytics.Api/Arif.Platform.Analytics.Api.csproj", "src/services/Analytics/Arif.Platform.Analytics.Api/"]
+COPY ["backend/src/services/Analytics/Arif.Platform.Analytics.Domain/Arif.Platform.Analytics.Domain.csproj", "src/services/Analytics/Arif.Platform.Analytics.Domain/"]
+COPY ["backend/src/services/Analytics/Arif.Platform.Analytics.Infrastructure/Arif.Platform.Analytics.Infrastructure.csproj", "src/services/Analytics/Arif.Platform.Analytics.Infrastructure/"]
+
+COPY ["backend/src/services/Subscription/Arif.Platform.Subscription.Api/Arif.Platform.Subscription.Api.csproj", "src/services/Subscription/Arif.Platform.Subscription.Api/"]
+COPY ["backend/src/services/Subscription/Arif.Platform.Subscription.Domain/Arif.Platform.Subscription.Domain.csproj", "src/services/Subscription/Arif.Platform.Subscription.Domain/"]
+COPY ["backend/src/services/Subscription/Arif.Platform.Subscription.Infrastructure/Arif.Platform.Subscription.Infrastructure.csproj", "src/services/Subscription/Arif.Platform.Subscription.Infrastructure/"]
+
+COPY ["backend/src/services/Notification/Arif.Platform.Notification.Api/Arif.Platform.Notification.Api.csproj", "src/services/Notification/Arif.Platform.Notification.Api/"]
+COPY ["backend/src/services/Notification/Arif.Platform.Notification.Domain/Arif.Platform.Notification.Domain.csproj", "src/services/Notification/Arif.Platform.Notification.Domain/"]
+COPY ["backend/src/services/Notification/Arif.Platform.Notification.Infrastructure/Arif.Platform.Notification.Infrastructure.csproj", "src/services/Notification/Arif.Platform.Notification.Infrastructure/"]
+
+COPY ["backend/src/services/LiveAgent/Arif.Platform.LiveAgent.Api/Arif.Platform.LiveAgent.Api.csproj", "src/services/LiveAgent/Arif.Platform.LiveAgent.Api/"]
+COPY ["backend/src/services/LiveAgent/Arif.Platform.LiveAgent.Domain/Arif.Platform.LiveAgent.Domain.csproj", "src/services/LiveAgent/Arif.Platform.LiveAgent.Domain/"]
+COPY ["backend/src/services/LiveAgent/Arif.Platform.LiveAgent.Infrastructure/Arif.Platform.LiveAgent.Infrastructure.csproj", "src/services/LiveAgent/Arif.Platform.LiveAgent.Infrastructure/"]
+
+# Restore dependencies
+RUN dotnet restore "Arif.Platform.sln"
+
+# Copy the entire source code
+COPY backend/ .
+
+# Build argument to specify which service to build
+ARG SERVICE_NAME
+ARG SERVICE_PATH
+
+# Build the specific service
+RUN dotnet build "${SERVICE_PATH}" -c Release -o /app/build --no-restore
+
+# Publish the service
+FROM build AS publish
+ARG SERVICE_PATH
+RUN dotnet publish "${SERVICE_PATH}" -c Release -o /app/publish --no-restore
+
+# Final stage
+FROM base AS final
+WORKDIR /app
+
+# Copy published application
+COPY --from=publish /app/publish .
+
+# Create non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN chown -R appuser:appuser /app
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:5000/health || exit 1
+
+# Set the entry point
+ARG SERVICE_DLL
+ENTRYPOINT ["sh", "-c", "dotnet ${SERVICE_DLL}"]

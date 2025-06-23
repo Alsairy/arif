@@ -1,0 +1,503 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arif-ai-orchestration
+  namespace: arif-platform
+  labels:
+    app: arif-ai-orchestration
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: arif-ai-orchestration
+  template:
+    metadata:
+      labels:
+        app: arif-ai-orchestration
+    spec:
+      containers:
+      - name: ai-orchestration
+        image: arif-platform/ai-orchestration:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ASPNETCORE_URLS
+          value: "http://+:5000"
+        envFrom:
+        - configMapRef:
+            name: arif-platform-config
+        - secretRef:
+            name: arif-platform-secrets
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arif-ai-orchestration
+  namespace: arif-platform
+spec:
+  selector:
+    app: arif-ai-orchestration
+  ports:
+  - port: 5002
+    targetPort: 5000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arif-chatbot-runtime
+  namespace: arif-platform
+  labels:
+    app: arif-chatbot-runtime
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: arif-chatbot-runtime
+  template:
+    metadata:
+      labels:
+        app: arif-chatbot-runtime
+    spec:
+      containers:
+      - name: chatbot-runtime
+        image: arif-platform/chatbot-runtime:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ASPNETCORE_URLS
+          value: "http://+:5000"
+        envFrom:
+        - configMapRef:
+            name: arif-platform-config
+        - secretRef:
+            name: arif-platform-secrets
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arif-chatbot-runtime
+  namespace: arif-platform
+spec:
+  selector:
+    app: arif-chatbot-runtime
+  ports:
+  - port: 5003
+    targetPort: 5000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arif-workflow-engine
+  namespace: arif-platform
+  labels:
+    app: arif-workflow-engine
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: arif-workflow-engine
+  template:
+    metadata:
+      labels:
+        app: arif-workflow-engine
+    spec:
+      containers:
+      - name: workflow-engine
+        image: arif-platform/workflow-engine:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ASPNETCORE_URLS
+          value: "http://+:5000"
+        envFrom:
+        - configMapRef:
+            name: arif-platform-config
+        - secretRef:
+            name: arif-platform-secrets
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arif-workflow-engine
+  namespace: arif-platform
+spec:
+  selector:
+    app: arif-workflow-engine
+  ports:
+  - port: 5004
+    targetPort: 5000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arif-integration-gateway
+  namespace: arif-platform
+  labels:
+    app: arif-integration-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: arif-integration-gateway
+  template:
+    metadata:
+      labels:
+        app: arif-integration-gateway
+    spec:
+      containers:
+      - name: integration-gateway
+        image: arif-platform/integration-gateway:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ASPNETCORE_URLS
+          value: "http://+:5000"
+        envFrom:
+        - configMapRef:
+            name: arif-platform-config
+        - secretRef:
+            name: arif-platform-secrets
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arif-integration-gateway
+  namespace: arif-platform
+spec:
+  selector:
+    app: arif-integration-gateway
+  ports:
+  - port: 5005
+    targetPort: 5000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arif-analytics
+  namespace: arif-platform
+  labels:
+    app: arif-analytics
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: arif-analytics
+  template:
+    metadata:
+      labels:
+        app: arif-analytics
+    spec:
+      containers:
+      - name: analytics
+        image: arif-platform/analytics:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ASPNETCORE_URLS
+          value: "http://+:5000"
+        envFrom:
+        - configMapRef:
+            name: arif-platform-config
+        - secretRef:
+            name: arif-platform-secrets
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arif-analytics
+  namespace: arif-platform
+spec:
+  selector:
+    app: arif-analytics
+  ports:
+  - port: 5006
+    targetPort: 5000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arif-subscription
+  namespace: arif-platform
+  labels:
+    app: arif-subscription
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: arif-subscription
+  template:
+    metadata:
+      labels:
+        app: arif-subscription
+    spec:
+      containers:
+      - name: subscription
+        image: arif-platform/subscription:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ASPNETCORE_URLS
+          value: "http://+:5000"
+        envFrom:
+        - configMapRef:
+            name: arif-platform-config
+        - secretRef:
+            name: arif-platform-secrets
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arif-subscription
+  namespace: arif-platform
+spec:
+  selector:
+    app: arif-subscription
+  ports:
+  - port: 5007
+    targetPort: 5000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arif-notification
+  namespace: arif-platform
+  labels:
+    app: arif-notification
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: arif-notification
+  template:
+    metadata:
+      labels:
+        app: arif-notification
+    spec:
+      containers:
+      - name: notification
+        image: arif-platform/notification:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ASPNETCORE_URLS
+          value: "http://+:5000"
+        envFrom:
+        - configMapRef:
+            name: arif-platform-config
+        - secretRef:
+            name: arif-platform-secrets
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arif-notification
+  namespace: arif-platform
+spec:
+  selector:
+    app: arif-notification
+  ports:
+  - port: 5008
+    targetPort: 5000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arif-live-agent
+  namespace: arif-platform
+  labels:
+    app: arif-live-agent
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: arif-live-agent
+  template:
+    metadata:
+      labels:
+        app: arif-live-agent
+    spec:
+      containers:
+      - name: live-agent
+        image: arif-platform/live-agent:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ASPNETCORE_URLS
+          value: "http://+:5000"
+        envFrom:
+        - configMapRef:
+            name: arif-platform-config
+        - secretRef:
+            name: arif-platform-secrets
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arif-live-agent
+  namespace: arif-platform
+spec:
+  selector:
+    app: arif-live-agent
+  ports:
+  - port: 5009
+    targetPort: 5000
+  type: ClusterIP

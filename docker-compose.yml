@@ -1,0 +1,431 @@
+version: '3.8'
+
+services:
+  # Infrastructure Services
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: arif-sqlserver
+    environment:
+      SA_PASSWORD: "ArifPlatform2024!"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'ArifPlatform2024!' -Q 'SELECT 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - arif-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: arif-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - arif-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        SERVICE_NAME: "ApiGateway"
+        SERVICE_PATH: "src/gateways/Arif.Platform.ApiGateway/Arif.Platform.ApiGateway.csproj"
+        SERVICE_DLL: "Arif.Platform.ApiGateway.dll"
+    container_name: arif-api-gateway
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ArifPlatform;User Id=sa;Password=ArifPlatform2024!;TrustServerCertificate=true;
+      - Redis__ConnectionString=redis:6379
+      - JWT__SecretKey=your-super-secret-jwt-key-change-in-production-min-32-chars
+      - JWT__Issuer=ArifPlatform
+      - JWT__Audience=ArifPlatformUsers
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - arif-network
+
+  # Backend .NET Services
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        SERVICE_NAME: "Authentication"
+        SERVICE_PATH: "src/services/Authentication/Arif.Platform.Authentication.Api/Arif.Platform.Authentication.Api.csproj"
+        SERVICE_DLL: "Arif.Platform.Authentication.Api.dll"
+    container_name: arif-auth-service
+    ports:
+      - "5001:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ArifPlatform;User Id=sa;Password=ArifPlatform2024!;TrustServerCertificate=true;
+      - Redis__ConnectionString=redis:6379
+      - JWT__SecretKey=your-super-secret-jwt-key-change-in-production-min-32-chars
+      - JWT__Issuer=ArifPlatform
+      - JWT__Audience=ArifPlatformUsers
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - arif-network
+
+  ai-orchestration-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        SERVICE_NAME: "AIOrchestration"
+        SERVICE_PATH: "src/services/AIOrchestration/Arif.Platform.AIOrchestration.Api/Arif.Platform.AIOrchestration.Api.csproj"
+        SERVICE_DLL: "Arif.Platform.AIOrchestration.Api.dll"
+    container_name: arif-ai-orchestration
+    ports:
+      - "5002:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ArifPlatform;User Id=sa;Password=ArifPlatform2024!;TrustServerCertificate=true;
+      - Redis__ConnectionString=redis:6379
+      - JWT__SecretKey=your-super-secret-jwt-key-change-in-production-min-32-chars
+      - OpenAI__ApiKey=${OPENAI_API_KEY}
+      - Azure__OpenAI__Endpoint=${AZURE_OPENAI_ENDPOINT}
+      - Azure__OpenAI__ApiKey=${AZURE_OPENAI_API_KEY}
+    depends_on:
+      - sqlserver
+      - redis
+      - auth-service
+    networks:
+      - arif-network
+
+  chatbot-runtime-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        SERVICE_NAME: "ChatbotRuntime"
+        SERVICE_PATH: "src/services/ChatbotRuntime/Arif.Platform.ChatbotRuntime.Api/Arif.Platform.ChatbotRuntime.Api.csproj"
+        SERVICE_DLL: "Arif.Platform.ChatbotRuntime.Api.dll"
+    container_name: arif-chatbot-runtime
+    ports:
+      - "5003:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ArifPlatform;User Id=sa;Password=ArifPlatform2024!;TrustServerCertificate=true;
+      - Redis__ConnectionString=redis:6379
+      - JWT__SecretKey=your-super-secret-jwt-key-change-in-production-min-32-chars
+    depends_on:
+      - sqlserver
+      - redis
+      - auth-service
+      - ai-orchestration-service
+    networks:
+      - arif-network
+
+  workflow-engine-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        SERVICE_NAME: "WorkflowEngine"
+        SERVICE_PATH: "src/services/WorkflowEngine/Arif.Platform.WorkflowEngine.Api/Arif.Platform.WorkflowEngine.Api.csproj"
+        SERVICE_DLL: "Arif.Platform.WorkflowEngine.Api.dll"
+    container_name: arif-workflow-engine
+    ports:
+      - "5004:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ArifPlatform;User Id=sa;Password=ArifPlatform2024!;TrustServerCertificate=true;
+      - Redis__ConnectionString=redis:6379
+      - JWT__SecretKey=your-super-secret-jwt-key-change-in-production-min-32-chars
+    depends_on:
+      - sqlserver
+      - redis
+      - auth-service
+    networks:
+      - arif-network
+
+  integration-gateway-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        SERVICE_NAME: "IntegrationGateway"
+        SERVICE_PATH: "src/services/IntegrationGateway/Arif.Platform.IntegrationGateway.Api/Arif.Platform.IntegrationGateway.Api.csproj"
+        SERVICE_DLL: "Arif.Platform.IntegrationGateway.Api.dll"
+    container_name: arif-integration-gateway
+    ports:
+      - "5005:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ArifPlatform;User Id=sa;Password=ArifPlatform2024!;TrustServerCertificate=true;
+      - Redis__ConnectionString=redis:6379
+      - JWT__SecretKey=your-super-secret-jwt-key-change-in-production-min-32-chars
+      - Twilio__AccountSid=${TWILIO_ACCOUNT_SID}
+      - Twilio__AuthToken=${TWILIO_AUTH_TOKEN}
+      - Facebook__AppId=${FACEBOOK_APP_ID}
+      - Facebook__AppSecret=${FACEBOOK_APP_SECRET}
+      - Slack__BotToken=${SLACK_BOT_TOKEN}
+      - Salesforce__ClientId=${SALESFORCE_CLIENT_ID}
+      - Salesforce__ClientSecret=${SALESFORCE_CLIENT_SECRET}
+      - HubSpot__ApiKey=${HUBSPOT_API_KEY}
+    depends_on:
+      - sqlserver
+      - redis
+      - auth-service
+    networks:
+      - arif-network
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        SERVICE_NAME: "Analytics"
+        SERVICE_PATH: "src/services/Analytics/Arif.Platform.Analytics.Api/Arif.Platform.Analytics.Api.csproj"
+        SERVICE_DLL: "Arif.Platform.Analytics.Api.dll"
+    container_name: arif-analytics
+    ports:
+      - "5006:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ArifPlatform;User Id=sa;Password=ArifPlatform2024!;TrustServerCertificate=true;
+      - Redis__ConnectionString=redis:6379
+      - JWT__SecretKey=your-super-secret-jwt-key-change-in-production-min-32-chars
+    depends_on:
+      - sqlserver
+      - redis
+      - auth-service
+    networks:
+      - arif-network
+
+  subscription-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        SERVICE_NAME: "Subscription"
+        SERVICE_PATH: "src/services/Subscription/Arif.Platform.Subscription.Api/Arif.Platform.Subscription.Api.csproj"
+        SERVICE_DLL: "Arif.Platform.Subscription.Api.dll"
+    container_name: arif-subscription
+    ports:
+      - "5007:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ArifPlatform;User Id=sa;Password=ArifPlatform2024!;TrustServerCertificate=true;
+      - Redis__ConnectionString=redis:6379
+      - JWT__SecretKey=your-super-secret-jwt-key-change-in-production-min-32-chars
+      - Stripe__SecretKey=${STRIPE_SECRET_KEY}
+      - Stripe__PublishableKey=${STRIPE_PUBLISHABLE_KEY}
+      - Stripe__WebhookSecret=${STRIPE_WEBHOOK_SECRET}
+    depends_on:
+      - sqlserver
+      - redis
+      - auth-service
+    networks:
+      - arif-network
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        SERVICE_NAME: "Notification"
+        SERVICE_PATH: "src/services/Notification/Arif.Platform.Notification.Api/Arif.Platform.Notification.Api.csproj"
+        SERVICE_DLL: "Arif.Platform.Notification.Api.dll"
+    container_name: arif-notification
+    ports:
+      - "5008:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ArifPlatform;User Id=sa;Password=ArifPlatform2024!;TrustServerCertificate=true;
+      - Redis__ConnectionString=redis:6379
+      - JWT__SecretKey=your-super-secret-jwt-key-change-in-production-min-32-chars
+      - SMTP__Host=${SMTP_HOST}
+      - SMTP__Port=${SMTP_PORT}
+      - SMTP__Username=${SMTP_USERNAME}
+      - SMTP__Password=${SMTP_PASSWORD}
+      - Firebase__ServerKey=${FIREBASE_SERVER_KEY}
+      - Firebase__SenderId=${FIREBASE_SENDER_ID}
+    depends_on:
+      - sqlserver
+      - redis
+      - auth-service
+    networks:
+      - arif-network
+
+  live-agent-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        SERVICE_NAME: "LiveAgent"
+        SERVICE_PATH: "src/services/LiveAgent/Arif.Platform.LiveAgent.Api/Arif.Platform.LiveAgent.Api.csproj"
+        SERVICE_DLL: "Arif.Platform.LiveAgent.Api.dll"
+    container_name: arif-live-agent
+    ports:
+      - "5009:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ArifPlatform;User Id=sa;Password=ArifPlatform2024!;TrustServerCertificate=true;
+      - Redis__ConnectionString=redis:6379
+      - JWT__SecretKey=your-super-secret-jwt-key-change-in-production-min-32-chars
+    depends_on:
+      - sqlserver
+      - redis
+      - auth-service
+    networks:
+      - arif-network
+
+  # Frontend Services
+  admin-dashboard:
+    build:
+      context: ./admin-dashboard
+      dockerfile: ../Dockerfile.frontend
+      target: development
+    container_name: arif-admin-dashboard
+    ports:
+      - "3000:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+      - VITE_ENVIRONMENT=development
+    volumes:
+      - ./admin-dashboard:/app
+      - /app/node_modules
+    depends_on:
+      - api-gateway
+    networks:
+      - arif-network
+
+  tenant-dashboard:
+    build:
+      context: ./tenant-dashboard
+      dockerfile: ../Dockerfile.frontend
+      target: development
+    container_name: arif-tenant-dashboard
+    ports:
+      - "3001:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+      - VITE_ENVIRONMENT=development
+    volumes:
+      - ./tenant-dashboard:/app
+      - /app/node_modules
+    depends_on:
+      - api-gateway
+    networks:
+      - arif-network
+
+  chat-widget:
+    build:
+      context: ./chat-widget
+      dockerfile: ../Dockerfile.frontend
+      target: development
+    container_name: arif-chat-widget
+    ports:
+      - "3002:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+      - VITE_ENVIRONMENT=development
+    volumes:
+      - ./chat-widget:/app
+      - /app/node_modules
+    depends_on:
+      - api-gateway
+    networks:
+      - arif-network
+
+  agent-interface:
+    build:
+      context: ./agent-interface
+      dockerfile: ../Dockerfile.frontend
+      target: development
+    container_name: arif-agent-interface
+    ports:
+      - "3003:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+      - VITE_ENVIRONMENT=development
+    volumes:
+      - ./agent-interface:/app
+      - /app/node_modules
+    depends_on:
+      - api-gateway
+    networks:
+      - arif-network
+
+  landing-page:
+    build:
+      context: ./landing-page
+      dockerfile: ../Dockerfile.frontend
+      target: development
+    container_name: arif-landing-page
+    ports:
+      - "3004:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+      - VITE_ENVIRONMENT=development
+    volumes:
+      - ./landing-page:/app
+      - /app/node_modules
+    depends_on:
+      - api-gateway
+    networks:
+      - arif-network
+
+  # Monitoring and Logging
+  nginx:
+    image: nginx:alpine
+    container_name: arif-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - api-gateway
+      - admin-dashboard
+      - tenant-dashboard
+      - chat-widget
+      - agent-interface
+      - landing-page
+    networks:
+      - arif-network
+
+volumes:
+  sqlserver_data:
+  redis_data:
+
+networks:
+  arif-network:
+    driver: bridge

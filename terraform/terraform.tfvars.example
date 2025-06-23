@@ -1,0 +1,67 @@
+# Azure Configuration
+resource_group_name = "rg-arif-platform-prod"
+location           = "East US"
+environment        = "prod"
+
+# AKS Configuration
+cluster_name    = "aks-arif-platform-prod"
+node_count      = 3
+min_node_count  = 2
+max_node_count  = 10
+node_vm_size    = "Standard_D4s_v3"
+
+# Azure Container Registry
+acr_name = "acrarifplatformprod"
+
+# Azure SQL Database
+sql_server_name    = "sql-arif-platform-prod"
+sql_database_name  = "ArifPlatform"
+sql_admin_username = "arifadmin"
+sql_admin_password = "YourSecurePassword123!"
+
+# Azure Cache for Redis
+redis_name = "redis-arif-platform-prod"
+
+# Azure Key Vault
+key_vault_name = "kv-arif-platform-prod"
+
+# Security
+jwt_secret_key = "your-super-secret-jwt-key-change-in-production-min-32-chars"
+
+# Integration API Keys (set these to your actual values)
+openai_api_key         = ""
+azure_openai_endpoint  = ""
+azure_openai_api_key   = ""
+
+# Twilio Configuration
+twilio_account_sid = ""
+twilio_auth_token  = ""
+
+# Facebook Configuration
+facebook_app_id     = ""
+facebook_app_secret = ""
+
+# Slack Configuration
+slack_bot_token = ""
+
+# Salesforce Configuration
+salesforce_client_id     = ""
+salesforce_client_secret = ""
+
+# HubSpot Configuration
+hubspot_api_key = ""
+
+# Stripe Configuration
+stripe_secret_key      = ""
+stripe_publishable_key = ""
+stripe_webhook_secret  = ""
+
+# SMTP Configuration
+smtp_host     = ""
+smtp_port     = 587
+smtp_username = ""
+smtp_password = ""
+
+# Firebase Configuration
+firebase_server_key = ""
+firebase_sender_id  = ""

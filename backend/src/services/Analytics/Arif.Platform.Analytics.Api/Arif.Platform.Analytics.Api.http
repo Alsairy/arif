@@ -1,0 +1,6 @@
+@Arif.Platform.Analytics.Api_HostAddress = http://localhost:5157
+
+GET {{Arif.Platform.Analytics.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

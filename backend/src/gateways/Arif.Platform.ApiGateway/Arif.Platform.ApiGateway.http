@@ -1,0 +1,6 @@
+@Arif.Platform.ApiGateway_HostAddress = http://localhost:5220
+
+GET {{Arif.Platform.ApiGateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

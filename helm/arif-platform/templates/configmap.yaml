@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "arif-platform.fullname" . }}-config
+  labels:
+    {{- include "arif-platform.labels" . | nindent 4 }}
+data:
+  ASPNETCORE_ENVIRONMENT: {{ .Values.global.environment | quote }}
+  JWT__Issuer: {{ .Values.security.jwt.issuer | quote }}
+  JWT__Audience: {{ .Values.security.jwt.audience | quote }}
+  {{- if .Values.redis.enabled }}
+  Redis__ConnectionString: "{{ include "arif-platform.fullname" . }}-redis:6379"
+  {{- end }}
+  {{- if .Values.sqlserver.enabled }}
+  ConnectionStrings__DefaultConnection: "Server={{ include "arif-platform.fullname" . }}-sqlserver;Database=ArifPlatform;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=true;"
+  {{- end }}
