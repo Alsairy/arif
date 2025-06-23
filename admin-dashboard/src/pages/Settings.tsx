@@ -78,7 +78,7 @@ const Settings = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000))
       toast.success('Profile updated successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to update profile')
     } finally {
       setIsLoading(false)
@@ -101,7 +101,7 @@ const Settings = () => {
         new_password: '',
         confirm_password: ''
       })
-    } catch (error) {
+    } catch {
       toast.error('Failed to update security settings')
     } finally {
       setIsLoading(false)
@@ -113,7 +113,7 @@ const Settings = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000))
       toast.success('Notification preferences updated successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to update notification settings')
     } finally {
       setIsLoading(false)
@@ -125,7 +125,7 @@ const Settings = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000))
       toast.success('System settings updated successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to update system settings')
     } finally {
       setIsLoading(false)

@@ -50,7 +50,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const response = await axios.get(`${API_BASE_URL}/auth/me`)
           setUser(response.data)
           setToken(storedToken)
-        } catch (error) {
+        } catch {
           localStorage.removeItem('admin_token')
           delete axios.defaults.headers.common['Authorization']
         }
@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       setToken(access_token)
       setUser(userData)
-    } catch (error) {
+    } catch {
       throw new Error('Invalid credentials')
     }
   }

@@ -150,7 +150,7 @@ const TenantManagement = () => {
       ]
       
       setTenants(mockTenants)
-    } catch (error) {
+    } catch {
       toast.error('Failed to fetch tenants')
     } finally {
       setIsLoading(false)
@@ -178,7 +178,7 @@ const TenantManagement = () => {
       setIsAddDialogOpen(false)
       resetForm()
       toast.success('Tenant created successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to create tenant')
     }
   }
@@ -199,7 +199,7 @@ const TenantManagement = () => {
       setEditingTenant(null)
       resetForm()
       toast.success('Tenant updated successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to update tenant')
     }
   }
@@ -210,7 +210,7 @@ const TenantManagement = () => {
       
       setTenants(tenants.filter(tenant => tenant.id !== tenantId))
       toast.success('Tenant deleted successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete tenant')
     }
   }

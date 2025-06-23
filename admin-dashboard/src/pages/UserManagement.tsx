@@ -136,7 +136,7 @@ const UserManagement = () => {
       ]
       
       setUsers(mockUsers)
-    } catch (error) {
+    } catch {
       toast.error('Failed to fetch users')
     } finally {
       setIsLoading(false)
@@ -160,7 +160,7 @@ const UserManagement = () => {
       setIsAddDialogOpen(false)
       resetForm()
       toast.success('User created successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to create user')
     }
   }
@@ -181,7 +181,7 @@ const UserManagement = () => {
       setEditingUser(null)
       resetForm()
       toast.success('User updated successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to update user')
     }
   }
@@ -192,7 +192,7 @@ const UserManagement = () => {
       
       setUsers(users.filter(user => user.id !== userId))
       toast.success('User deleted successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete user')
     }
   }

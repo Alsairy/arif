@@ -31,7 +31,7 @@ const LoginPage = () => {
     try {
       await login(email, password)
       toast.success(t('common.success'))
-    } catch (err) {
+    } catch {
       setError(t('login.error'))
       toast.error(t('login.error'))
     } finally {
