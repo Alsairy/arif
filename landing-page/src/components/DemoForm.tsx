@@ -72,7 +72,7 @@ const DemoForm: React.FC = () => {
         phone: '',
         message: ''
       })
-    } catch (err) {
+    } catch {
       setError(direction === 'rtl' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'An error occurred. Please try again.')
     } finally {
       setIsSubmitting(false)

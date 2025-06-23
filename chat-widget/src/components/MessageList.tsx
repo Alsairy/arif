@@ -33,7 +33,7 @@ const MessageList: React.FC<MessageListProps> = ({
     }).format(timestamp)
   }
 
-  const renderMessageContent = (message: any) => {
+  const renderMessageContent = (message: { id: string; content: string; type: string; sender: string; timestamp: Date; isStreaming?: boolean; quickReplies?: { id: string; text: string; payload: string }[]; menuOptions?: { id: string; title: string; description?: string; icon?: string; payload: string }[]; metadata?: { fileUrl?: string; fileSize?: number; fileName?: string; fileType?: string } }) => {
     switch (message.type) {
       case 'image':
         return (

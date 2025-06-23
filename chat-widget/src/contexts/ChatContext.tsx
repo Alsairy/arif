@@ -9,7 +9,7 @@ export interface Message {
   isStreaming?: boolean
   quickReplies?: QuickReply[]
   menuOptions?: MenuOption[]
-  metadata?: Record<string, any>
+  metadata?: { fileUrl?: string; fileSize?: number; fileName?: string; fileType?: string }
 }
 
 export interface QuickReply {
@@ -71,8 +71,8 @@ export const ChatProvider = ({
   children, 
   botId = 'default',
   userId,
-  apiUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000',
-  websocketUrl = (import.meta as any).env?.VITE_WEBSOCKET_URL || 'ws://localhost:8000/ws'
+  apiUrl = (import.meta as { env?: Record<string, string> }).env?.VITE_API_URL || 'http://localhost:8000',
+  websocketUrl = (import.meta as { env?: Record<string, string> }).env?.VITE_WEBSOCKET_URL || 'ws://localhost:8000/ws'
 }: ChatProviderProps) => {
   const [state, setState] = useState<ChatState>({
     isOpen: false,
@@ -144,7 +144,7 @@ export const ChatProvider = ({
     }
   }
 
-  const handleIncomingMessage = (data: any) => {
+  const handleIncomingMessage = (data: { type: string; id?: string; content?: string; message_type?: 'text' | 'image' | 'file' | 'quick_reply' | 'menu'; timestamp?: string; is_streaming?: boolean; quick_replies?: QuickReply[]; menu_options?: MenuOption[]; metadata?: { fileUrl?: string; fileSize?: number; fileName?: string; fileType?: string }; session_id?: string }) => {
     if (data.type === 'typing_start') {
       setState(prev => ({ ...prev, isTyping: true }))
       return
@@ -158,7 +158,7 @@ export const ChatProvider = ({
     if (data.type === 'message') {
       const message: Message = {
         id: data.id || Date.now().toString(),
-        content: data.content,
+        content: data.content || '',
         type: data.message_type || 'text',
         sender: 'bot',
         timestamp: new Date(data.timestamp || Date.now()),
@@ -190,7 +190,7 @@ export const ChatProvider = ({
     }
 
     if (data.type === 'session_created') {
-      setState(prev => ({ ...prev, sessionId: data.session_id }))
+      setState(prev => ({ ...prev, sessionId: data.session_id || null }))
     }
   }
 
@@ -200,7 +200,7 @@ export const ChatProvider = ({
     const userMessage: Message = {
       id: Date.now().toString(),
       content: content.trim(),
-      type: type as any,
+      type: type as 'text' | 'image' | 'file' | 'quick_reply' | 'menu',
       sender: 'user',
       timestamp: new Date()
     }
@@ -271,7 +271,7 @@ export const ChatProvider = ({
   }
 
   const uploadFile = async (file: File): Promise<void> => {
-    const maxSize = parseInt((import.meta as any).env?.VITE_UPLOAD_MAX_SIZE || '10485760')
+    const maxSize = parseInt((import.meta as { env?: Record<string, string> }).env?.VITE_UPLOAD_MAX_SIZE || '10485760')
     if (file.size > maxSize) {
       throw new Error('File size exceeds maximum allowed size')
     }

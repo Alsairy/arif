@@ -3,13 +3,10 @@ import { useChat } from '@/contexts/ChatContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
+
 import { 
   Send, 
   Paperclip, 
-  Image as ImageIcon, 
-  FileText, 
-  X,
   Upload
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -27,7 +24,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ theme = 'light' }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const direction = language === 'ar' ? 'rtl' : 'ltr'
 
-  const maxLength = parseInt((import.meta as any).env?.VITE_MAX_MESSAGE_LENGTH || '1000')
+  const maxLength = parseInt((import.meta as { env?: Record<string, string> }).env?.VITE_MAX_MESSAGE_LENGTH || '1000')
 
   const handleSend = useCallback(() => {
     if (!message.trim() || !state.isConnected) return
@@ -47,7 +44,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ theme = 'light' }) => {
     if (!files || files.length === 0) return
 
     const file = files[0]
-    const maxSize = parseInt((import.meta as any).env?.VITE_UPLOAD_MAX_SIZE || '10485760')
+    const maxSize = parseInt((import.meta as { env?: Record<string, string> }).env?.VITE_UPLOAD_MAX_SIZE || '10485760')
     
     if (file.size > maxSize) {
       toast.error(t('upload.size_error'))

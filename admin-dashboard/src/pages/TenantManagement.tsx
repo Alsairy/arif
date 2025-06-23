@@ -165,7 +165,7 @@ const TenantManagement = () => {
         id: Date.now().toString(),
         name: formData.name,
         domain: formData.domain,
-        plan: formData.plan as any,
+        plan: formData.plan as 'free' | 'basic' | 'professional' | 'enterprise',
         status: 'active',
         user_count: 1,
         bot_count: 0,
@@ -191,7 +191,7 @@ const TenantManagement = () => {
       
       const updatedTenants = tenants.map(tenant => 
         tenant.id === editingTenant.id 
-          ? { ...tenant, name: formData.name, domain: formData.domain, plan: formData.plan as any }
+          ? { ...tenant, name: formData.name, domain: formData.domain, plan: formData.plan as 'free' | 'basic' | 'professional' | 'enterprise' }
           : tenant
       )
       

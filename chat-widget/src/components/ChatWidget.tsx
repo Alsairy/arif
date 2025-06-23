@@ -32,8 +32,6 @@ interface ChatWidgetProps {
 }
 
 const ChatWidget: React.FC<ChatWidgetProps> = ({
-  botId = 'default',
-  userId,
   position = 'bottom-right',
   theme = 'light',
   primaryColor = '#3B82F6',

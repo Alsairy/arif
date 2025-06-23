@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       try {
         const userData = JSON.parse(localStorage.getItem('tenant_user') || '{}')
         setUser(userData)
-      } catch (error) {
+      } catch {
         localStorage.removeItem('tenant_token')
         localStorage.removeItem('tenant_user')
       }
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setIsLoading(false)
   }, [])
 
-  const login = async (email: string, _password: string) => {
+  const login = async (email: string) => {
     setIsLoading(true)
     try {
       const mockUser: User = {
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       localStorage.setItem('tenant_token', mockToken)
       localStorage.setItem('tenant_user', JSON.stringify(mockUser))
       setUser(mockUser)
-    } catch (error) {
+    } catch {
       throw new Error('Invalid credentials')
     } finally {
       setIsLoading(false)

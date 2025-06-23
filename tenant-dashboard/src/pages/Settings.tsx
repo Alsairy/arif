@@ -9,16 +9,12 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
+
 import { 
-  Settings as SettingsIcon, 
   User, 
   Shield, 
-  Globe, 
   Bell,
   Key,
-  Database,
-  Palette,
   Save,
   Eye,
   EyeOff
@@ -72,7 +68,7 @@ const Settings = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000))
       toast.success('Profile updated successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to update profile')
     } finally {
       setIsLoading(false)
@@ -95,7 +91,7 @@ const Settings = () => {
         confirmPassword: ''
       })
       toast.success('Security settings updated successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to update security settings')
     } finally {
       setIsLoading(false)
@@ -107,7 +103,7 @@ const Settings = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000))
       toast.success('Notification preferences updated')
-    } catch (error) {
+    } catch {
       toast.error('Failed to update notification preferences')
     } finally {
       setIsLoading(false)
@@ -123,7 +119,7 @@ const Settings = () => {
         apiKey: 'sk-arif-' + Math.random().toString(36).substring(2, 34)
       })
       toast.success('API key regenerated successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to regenerate API key')
     } finally {
       setIsLoading(false)
@@ -139,7 +135,7 @@ const Settings = () => {
         webhookSecret: 'whsec_' + Math.random().toString(36).substring(2, 34)
       })
       toast.success('Webhook secret regenerated successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to regenerate webhook secret')
     } finally {
       setIsLoading(false)
@@ -151,7 +147,7 @@ const Settings = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000))
       toast.success('API settings updated successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to update API settings')
     } finally {
       setIsLoading(false)
@@ -254,7 +250,7 @@ const Settings = () => {
                 <div className="space-y-2">
                   <Label htmlFor="language">Preferred Language</Label>
                   <Select value={profile.language} onValueChange={(value) => {
-                    setProfile({...profile, language: value})
+                    setProfile({...profile, language: value as 'en' | 'ar'})
                     setLanguage(value as 'en' | 'ar')
                   }}>
                     <SelectTrigger>

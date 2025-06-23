@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode, useRef, useCallback } from 'react'
 import { useAuth } from './AuthContext'
 
 export interface Customer {
@@ -24,7 +24,7 @@ export interface ChatMessage {
   timestamp: Date
   agentId?: string
   agentName?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface ChatSession {
@@ -78,20 +78,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [unreadCount, setUnreadCount] = useState(0)
   const websocketRef = useRef<WebSocket | null>(null)
 
-  useEffect(() => {
-    if (user) {
-      initializeMockData()
-      connectWebSocket()
-    }
-    
-    return () => {
-      if (websocketRef.current) {
-        websocketRef.current.close()
-      }
-    }
-  }, [user])
-
-  const initializeMockData = () => {
+  const initializeMockData = useCallback(() => {
     const mockCustomers: Customer[] = [
       {
         id: '1',
@@ -178,9 +165,38 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
 
     setActiveChatSessions(mockSessions)
     setUnreadCount(1)
-  }
+  }, [user])
 
-  const connectWebSocket = () => {
+  const handleIncomingMessage = useCallback((data: { type: string; id: string; content: string; message_type?: 'text' | 'image' | 'file' | 'system'; sender: 'customer' | 'agent' | 'system'; timestamp: string; metadata?: Record<string, unknown>; chat_id: string }) => {
+    if (data.type === 'new_message') {
+      const message: ChatMessage = {
+        id: data.id,
+        content: data.content,
+        type: data.message_type || 'text',
+        sender: data.sender,
+        timestamp: new Date(data.timestamp),
+        metadata: data.metadata
+      }
+
+      setActiveChatSessions(prev => 
+        prev.map(session => 
+          session.id === data.chat_id
+            ? {
+                ...session,
+                messages: [...session.messages, message],
+                lastActivity: new Date()
+              }
+            : session
+        )
+      )
+
+      if (data.chat_id !== currentChatId) {
+        setUnreadCount(prev => prev + 1)
+      }
+    }
+  }, [currentChatId])
+
+  const connectWebSocket = useCallback(() => {
     try {
       const wsUrl = `${import.meta.env.VITE_WEBSOCKET_URL}/agent/${user?.id}`
       websocketRef.current = new WebSocket(wsUrl)
@@ -209,36 +225,20 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     } catch (error) {
       console.error('Failed to connect WebSocket:', error)
     }
-  }
+  }, [user, handleIncomingMessage])
 
-  const handleIncomingMessage = (data: any) => {
-    if (data.type === 'new_message') {
-      const message: ChatMessage = {
-        id: data.id,
-        content: data.content,
-        type: data.message_type || 'text',
-        sender: data.sender,
-        timestamp: new Date(data.timestamp),
-        metadata: data.metadata
-      }
-
-      setActiveChatSessions(prev => 
-        prev.map(session => 
-          session.id === data.chat_id
-            ? {
-                ...session,
-                messages: [...session.messages, message],
-                lastActivity: new Date()
-              }
-            : session
-        )
-      )
-
-      if (data.chat_id !== currentChatId) {
-        setUnreadCount(prev => prev + 1)
+  useEffect(() => {
+    if (user) {
+      initializeMockData()
+      connectWebSocket()
+    }
+    
+    return () => {
+      if (websocketRef.current) {
+        websocketRef.current.close()
       }
     }
-  }
+  }, [user, initializeMockData, connectWebSocket])
 
   const sendMessage = (chatId: string, content: string) => {
     if (!content.trim() || !user) return

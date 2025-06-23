@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -87,14 +87,14 @@ const Webhooks = () => {
       const webhook = {
         id: Date.now().toString(),
         ...newWebhook,
-        lastTriggered: null,
+        lastTriggered: '',
         status: 'pending'
       }
       
       setWebhooks([...webhooks, webhook])
       setNewWebhook({ name: '', url: '', events: [], isActive: true })
       toast.success('Webhook created successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to create webhook')
     } finally {
       setIsCreating(false)
@@ -114,7 +114,7 @@ const Webhooks = () => {
       ))
       
       toast.success('Webhook test successful')
-    } catch (error) {
+    } catch {
       setWebhooks(webhooks.map(webhook => 
         webhook.id === webhookId 
           ? { ...webhook, status: 'failed' }

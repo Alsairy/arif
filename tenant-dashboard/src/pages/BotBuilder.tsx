@@ -10,9 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { 
   Bot, 
-  Plus, 
   MessageSquare, 
-  Settings, 
   Play, 
   Save,
   Zap,
