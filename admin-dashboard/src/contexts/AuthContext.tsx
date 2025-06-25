@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('admin_token'))
   const [isLoading, setIsLoading] = useState(true)
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+  const API_BASE_URL = import.meta.env.VITE_AUTH_SERVICE_URL || 'http://localhost:5000'
 
   useEffect(() => {
     const initAuth = async () => {
@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
+      const response = await axios.post(`${API_BASE_URL}/api/authentication/login`, {
         email,
         password
       })

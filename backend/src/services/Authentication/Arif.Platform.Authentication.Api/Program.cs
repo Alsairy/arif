@@ -59,9 +59,15 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddDbContext<ArifPlatformDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-        ?? "Data Source=arif-platform.db;Cache=Shared";
-    options.UseSqlite(connectionString);
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        options.UseInMemoryDatabase("ArifPlatformInMemory");
+    }
+    else
+    {
+        options.UseSqlite(connectionString);
+    }
 });
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -91,9 +97,18 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ArifCorsPolicy", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins(
+                "https://arif-code-review-app-xczsu670.devinapps.com",
+                "https://arif-code-review-app-ddxl77iy.devinapps.com",
+                "https://arif-code-review-app-ec5kdlfl.devinapps.com",
+                "https://arif-code-review-app-gzmr1uth.devinapps.com",
+                "https://arif-codebase-checker-a0sau4n1.devinapps.com",
+                "https://arif-code-review-app-tunnel-zganjpzs.devinapps.com",
+                "https://user:a4d5aa1b961b77df777c8d640c833529@arif-code-review-app-tunnel-zganjpzs.devinapps.com"
+              )
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -120,10 +135,21 @@ builder.Services.AddScoped<IRateLimitingService, RateLimitingService>();
 builder.Services.AddScoped<IInputValidationService, InputValidationService>();
 builder.Services.AddScoped<ISecurityMonitoringService, SecurityMonitoringService>();
 
-builder.Services.AddDataProtection()
-    .PersistKeysToDbContext<ArifPlatformDbContext>()
-    .SetApplicationName("Arif.Platform")
-    .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo("/tmp/keys"))
+        .SetApplicationName("Arif.Platform")
+        .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
+}
+else
+{
+    builder.Services.AddDataProtection()
+        .PersistKeysToDbContext<ArifPlatformDbContext>()
+        .SetApplicationName("Arif.Platform")
+        .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
+}
 
 builder.Services.Configure<RateLimitOptions>(options =>
 {
@@ -158,12 +184,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("ArifCorsPolicy");
-
-app.UseMiddleware<TenantResolutionMiddleware>();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseMiddleware<SecurityHeadersMiddleware>();
+
+app.UseCors("ArifCorsPolicy");
+
+app.UseMiddleware<TenantResolutionMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -191,14 +218,53 @@ app.MapGet("/", () => new
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ArifPlatformDbContext>();
+    var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    
     try
     {
         context.Database.EnsureCreated();
+        
+        if (!context.Users.Any(u => u.Email == "admin@example.com"))
+        {
+            var defaultTenant = context.Tenants.FirstOrDefault() ?? new Arif.Platform.Shared.Domain.Entities.Tenant
+            {
+                Id = Guid.NewGuid(),
+                Name = "Default Admin Tenant",
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            
+            if (context.Tenants.FirstOrDefault() == null)
+            {
+                context.Tenants.Add(defaultTenant);
+                context.SaveChanges();
+            }
+
+            var adminUser = new Arif.Platform.Shared.Domain.Entities.User
+            {
+                Id = Guid.NewGuid(),
+                Email = "admin@example.com",
+                Username = "admin",
+                FirstName = "Admin",
+                LastName = "User",
+                PasswordHash = passwordHasher.HashPassword("password"),
+                IsActive = true,
+                EmailConfirmed = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                TenantId = defaultTenant.Id
+            };
+            
+            context.Users.Add(adminUser);
+            context.SaveChanges();
+            logger.LogInformation("Admin user created successfully with email: admin@example.com and TenantId: {TenantId}", defaultTenant.Id);
+        }
     }
     catch (Exception ex)
     {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogWarning(ex, "Could not ensure database creation. This is expected in production environments.");
+        logger.LogWarning(ex, "Could not ensure database creation or seeding. This is expected in production environments.");
     }
 }
 

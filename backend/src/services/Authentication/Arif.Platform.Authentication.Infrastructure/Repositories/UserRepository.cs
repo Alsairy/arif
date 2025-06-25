@@ -21,6 +21,15 @@ public class UserRepository : BaseRepository<User>, IUserRepository
             .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
+    public async Task<User?> GetByEmailIgnoreTenantAsync(string email, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.IgnoreQueryFilters()
+            .Include(u => u.Tenant)
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(u => u.Email == email && !u.IsDeleted, cancellationToken);
+    }
+
     public async Task<User?> GetByUsernameAsync(string username, CancellationToken cancellationToken = default)
     {
         return await _dbSet

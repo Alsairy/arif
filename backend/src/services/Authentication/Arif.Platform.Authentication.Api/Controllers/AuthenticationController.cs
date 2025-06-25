@@ -50,6 +50,36 @@ public class AuthenticationController : ControllerBase
         }
     }
 
+    [HttpPost("login-form")]
+    [ProducesResponseType(typeof(AuthenticationResult), 200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    public async Task<ActionResult<AuthenticationResult>> LoginFormAsync([FromForm] string email, [FromForm] string password)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                return BadRequest("Email and password are required");
+            }
+
+            var request = new LoginRequest(email, password);
+            var result = await _authenticationService.LoginAsync(request);
+            
+            if (!result.Success)
+            {
+                return Unauthorized(result);
+            }
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during form login for email: {Email}", email);
+            return StatusCode(500, new AuthenticationResult(false, ErrorMessage: "An internal error occurred"));
+        }
+    }
+
     [HttpPost("refresh")]
     [ProducesResponseType(typeof(AuthenticationResult), 200)]
     [ProducesResponseType(400)]
