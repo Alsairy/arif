@@ -68,12 +68,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         password
       })
 
-      const { access_token, user: userData } = response.data
+      const { accessToken, user: userData } = response.data
       
-      localStorage.setItem('admin_token', access_token)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+      localStorage.setItem('admin_token', accessToken)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
       
-      setToken(access_token)
+      setToken(accessToken)
       setUser(userData)
     } catch (error) {
       throw new Error('Invalid credentials')
