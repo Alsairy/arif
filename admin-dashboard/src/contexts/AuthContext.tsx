@@ -69,7 +69,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }, {
         withCredentials: true,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
       })
 
@@ -82,7 +83,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(userData)
     } catch (error) {
       console.error('Login error:', error)
-      throw new Error('Invalid credentials')
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        throw new Error('Invalid credentials')
+      }
+      throw new Error('Login failed. Please try again.')
     }
   }
 
