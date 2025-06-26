@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('admin_token'))
   const [isLoading, setIsLoading] = useState(true)
 
-  const API_BASE_URL = import.meta.env.VITE_AUTH_SERVICE_URL || 'http://localhost:8000'
+  const API_BASE_URL = import.meta.env.VITE_AUTH_SERVICE_URL || 'http://localhost:5000'
 
   useEffect(() => {
     const initAuth = async () => {
@@ -63,17 +63,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+      const response = await axios.post(`${API_BASE_URL}/api/authentication/login`, {
         email,
         password
       })
 
-      const { access_token, user: userData } = response.data
+      const { accessToken, user: userData } = response.data
       
-      localStorage.setItem('admin_token', access_token)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+      localStorage.setItem('admin_token', accessToken)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
       
-      setToken(access_token)
+      setToken(accessToken)
       setUser(userData)
     } catch (error) {
       throw new Error('Invalid credentials')

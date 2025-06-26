@@ -1,12 +1,43 @@
 {
   "Routes": [
     {
+      "DownstreamPathTemplate": "/health",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "auth-service",
+          "Port": 5000
+        }
+      ],
+      "UpstreamPathTemplate": "/health",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/authentication/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "auth-service",
+          "Port": 5000
+        }
+      ],
+      "UpstreamPathTemplate": "/api/authentication/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
+      "RateLimitOptions": {
+        "ClientWhitelist": [],
+        "EnableRateLimiting": true,
+        "Period": "1m",
+        "PeriodTimespan": 60,
+        "Limit": 100
+      }
+    },
+    {
       "DownstreamPathTemplate": "/api/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5001
+          "Host": "auth-service",
+          "Port": 5000
         }
       ],
       "UpstreamPathTemplate": "/api/auth/{everything}",
@@ -27,8 +58,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5002
+          "Host": "ai-orchestration-service",
+          "Port": 5000
         }
       ],
       "UpstreamPathTemplate": "/api/ai/{everything}",
@@ -49,8 +80,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5003
+          "Host": "chatbot-runtime-service",
+          "Port": 5000
         }
       ],
       "UpstreamPathTemplate": "/api/chatbot/{everything}",
@@ -71,8 +102,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5004
+          "Host": "workflow-engine-service",
+          "Port": 5000
         }
       ],
       "UpstreamPathTemplate": "/api/workflow/{everything}",
@@ -93,8 +124,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5005
+          "Host": "integration-gateway-service",
+          "Port": 5000
         }
       ],
       "UpstreamPathTemplate": "/api/integrations/{everything}",
@@ -115,8 +146,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5006
+          "Host": "analytics-service",
+          "Port": 5000
         }
       ],
       "UpstreamPathTemplate": "/api/analytics/{everything}",
@@ -137,8 +168,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5007
+          "Host": "subscription-service",
+          "Port": 5000
         }
       ],
       "UpstreamPathTemplate": "/api/subscriptions/{everything}",
@@ -159,8 +190,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5008
+          "Host": "notification-service",
+          "Port": 5000
         }
       ],
       "UpstreamPathTemplate": "/api/notifications/{everything}",
@@ -181,8 +212,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5009
+          "Host": "live-agent-service",
+          "Port": 5000
         }
       ],
       "UpstreamPathTemplate": "/api/live-agent/{everything}",
@@ -203,8 +234,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5010
+          "Host": "config-service",
+          "Port": 5000
         }
       ],
       "UpstreamPathTemplate": "/api/config/{everything}",
@@ -228,6 +259,25 @@
       "QuotaExceededMessage": "API rate limit exceeded. Please try again later.",
       "HttpStatusCode": 429,
       "ClientIdHeader": "X-Client-Id"
+    },
+    "HttpHandlerOptions": {
+      "AllowAutoRedirect": false,
+      "UseCookieContainer": false,
+      "UseTracing": false
+    },
+    "CorsPolicy": {
+      "AllowedOrigins": [
+        "https://arif-code-review-app-xczsu670.devinapps.com",
+        "https://arif-code-review-app-ddxl77iy.devinapps.com",
+        "https://arif-code-review-app-ec5kdlfl.devinapps.com",
+        "https://arif-code-review-app-gzmr1uth.devinapps.com",
+        "https://arif-codebase-checker-a0sau4n1.devinapps.com"
+      ],
+      "AllowedMethods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "AllowedHeaders": ["*"],
+      "ExposedHeaders": [],
+      "AllowCredentials": true,
+      "PreflightMaxAge": 86400
     }
   }
 }

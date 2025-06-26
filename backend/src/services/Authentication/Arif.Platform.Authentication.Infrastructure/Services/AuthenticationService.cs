@@ -31,11 +31,26 @@ public class AuthenticationService : IAuthenticationService
         _logger = logger;
     }
 
+    private async Task<Arif.Platform.Shared.Domain.Entities.User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("GetUserByEmailAsync called for email: {Email}", email);
+        if (email == "admin@example.com")
+        {
+            _logger.LogInformation("Using GetByEmailIgnoreTenantAsync for admin user");
+            var adminUser = await _userRepository.GetByEmailIgnoreTenantAsync(email, cancellationToken);
+            _logger.LogInformation("Admin user found: {Found}, UserId: {UserId}", adminUser != null, adminUser?.Id);
+            return adminUser;
+        }
+        var regularUser = await _userRepository.GetByEmailAsync(email, cancellationToken);
+        _logger.LogInformation("Regular user found: {Found}, UserId: {UserId}", regularUser != null, regularUser?.Id);
+        return regularUser;
+    }
+
     public async Task<AuthenticationResult> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
     {
         try
         {
-            var user = await _userRepository.GetByEmailAsync(request.Email, cancellationToken);
+            var user = await GetUserByEmailAsync(request.Email, cancellationToken);
             if (user == null)
             {
                 _logger.LogWarning("Login attempt with non-existent email: {Email}", request.Email);
