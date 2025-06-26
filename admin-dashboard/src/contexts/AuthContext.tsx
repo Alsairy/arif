@@ -66,6 +66,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await axios.post(`${API_BASE_URL}/api/authentication/login`, {
         email,
         password
+      }, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
 
       const { accessToken, user: userData } = response.data
@@ -76,6 +81,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setToken(accessToken)
       setUser(userData)
     } catch (error) {
+      console.error('Login error:', error)
       throw new Error('Invalid credentials')
     }
   }
