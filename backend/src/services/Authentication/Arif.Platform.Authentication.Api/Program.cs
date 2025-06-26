@@ -109,8 +109,8 @@ builder.Services.AddCors(options =>
                 "https://arif-code-review-app-ec5kdlfl.devinapps.com",
                 "https://arif-code-review-app-gzmr1uth.devinapps.com",
                 "https://arif-codebase-checker-a0sau4n1.devinapps.com",
-                "https://arif-code-review-app-tunnel-zganjpzs.devinapps.com",
-                "https://user:a4d5aa1b961b77df777c8d640c833529@arif-code-review-app-tunnel-zganjpzs.devinapps.com"
+                "https://arif-code-review-app-tunnel-9llvv5qw.devinapps.com",
+                "https://user:a4d5aa1b961b77df777c8d640c833529@arif-code-review-app-tunnel-9llvv5qw.devinapps.com"
               )
               .AllowAnyMethod()
               .AllowAnyHeader()
