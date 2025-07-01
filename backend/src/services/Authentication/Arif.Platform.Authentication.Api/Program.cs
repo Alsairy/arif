@@ -104,6 +104,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("ArifCorsPolicy", policy =>
     {
         policy.WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "http://localhost:3002",
+                "http://localhost:3003",
                 "https://arif-code-review-app-xczsu670.devinapps.com",
                 "https://arif-code-review-app-ddxl77iy.devinapps.com",
                 "https://arif-code-review-app-ec5kdlfl.devinapps.com",

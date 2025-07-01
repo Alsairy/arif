@@ -9,10 +9,15 @@ import {
   Settings, 
   Home,
   LogOut,
-  Zap
+  Zap,
+  X
 } from 'lucide-react'
 
-const Sidebar = () => {
+interface SidebarProps {
+  onClose?: () => void
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const location = useLocation()
   const { t, direction } = useLanguage()
   const { logout } = useAuth()
@@ -33,11 +38,30 @@ const Sidebar = () => {
     return location.pathname.startsWith(href)
   }
 
+  const handleLinkClick = () => {
+    if (onClose) {
+      onClose()
+    }
+  }
+
   return (
-    <div className={`bg-white shadow-sm border-r border-gray-200 w-64 flex flex-col ${direction === 'rtl' ? 'border-l border-r-0' : ''}`}>
-      <div className="flex items-center justify-center h-16 px-4 border-b border-gray-200">
-        <Bot className="h-8 w-8 text-primary mr-2" />
-        <span className="text-xl font-bold text-gray-900">Arif</span>
+    <div className={`bg-white shadow-sm border-r border-gray-200 w-64 flex flex-col h-full ${direction === 'rtl' ? 'border-l border-r-0' : ''}`}>
+      <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+        <div className="flex items-center">
+          <Bot className="h-8 w-8 text-primary mr-2" />
+          <span className="text-xl font-bold text-gray-900">Arif</span>
+        </div>
+        {/* Mobile close button */}
+        {onClose && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="lg:hidden"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        )}
       </div>
       
       <nav className="flex-1 px-4 py-6 space-y-2">
@@ -47,6 +71,7 @@ const Sidebar = () => {
             <Link
               key={item.name}
               to={item.href}
+              onClick={handleLinkClick}
               className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                 isActive(item.href)
                   ? 'bg-primary text-primary-foreground'
