@@ -1,3 +1,4 @@
+import React from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useTheme } from '@/components/theme-provider'
@@ -17,11 +18,16 @@ import {
   LogOut, 
   User, 
   Globe,
-  Bell
+  Bell,
+  Menu
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
-const Header = () => {
+interface HeaderProps {
+  onMenuClick?: () => void
+}
+
+const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { user, logout } = useAuth()
   const { language, setLanguage, t, direction } = useLanguage()
   const { theme, setTheme } = useTheme()
@@ -35,15 +41,26 @@ const Header = () => {
   }
 
   return (
-    <header className="bg-white shadow-sm border-b px-6 py-4">
+    <header className="bg-white shadow-sm border-b px-4 lg:px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-semibold text-gray-900">
+          {/* Mobile menu button */}
+          {onMenuClick && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onMenuClick}
+              className="lg:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
+          <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">
             {t('dashboard.title')}
           </h1>
         </div>
 
-        <div className={`flex items-center space-x-4 ${direction === 'rtl' ? 'space-x-reverse' : ''}`}>
+        <div className={`flex items-center space-x-2 lg:space-x-4 ${direction === 'rtl' ? 'space-x-reverse' : ''}`}>
           {/* Notifications */}
           <Button variant="ghost" size="sm" className="relative">
             <Bell className="h-5 w-5" />
@@ -57,8 +74,8 @@ const Header = () => {
 
           {/* Language Toggle */}
           <Button variant="ghost" size="sm" onClick={toggleLanguage}>
-            <Globe className="h-5 w-5 mr-2" />
-            {language.toUpperCase()}
+            <Globe className="h-4 w-4 lg:mr-2" />
+            <span className="hidden lg:inline">{language.toUpperCase()}</span>
           </Button>
 
           {/* Theme Toggle */}

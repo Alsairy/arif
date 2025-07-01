@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -11,12 +11,17 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Bot
+  Bot,
+  X
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-const Sidebar = () => {
+interface SidebarProps {
+  onClose?: () => void
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const [collapsed, setCollapsed] = useState(false)
   const { t, direction } = useLanguage()
   const { hasPermission } = useAuth()
@@ -65,9 +70,15 @@ const Sidebar = () => {
     hasPermission(item.permission)
   )
 
+  const handleLinkClick = () => {
+    if (onClose) {
+      onClose()
+    }
+  }
+
   return (
     <div className={cn(
-      "bg-white shadow-lg transition-all duration-300 flex flex-col",
+      "bg-white shadow-lg transition-all duration-300 flex flex-col h-full",
       collapsed ? "w-16" : "w-64",
       direction === 'rtl' && "border-l border-r-0"
     )}>
@@ -79,21 +90,35 @@ const Sidebar = () => {
             <span className="text-xl font-bold text-gray-900">عارف</span>
           </div>
         )}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCollapsed(!collapsed)}
-          className={cn(
-            "h-8 w-8 p-0",
-            collapsed && "mx-auto"
+        <div className="flex items-center space-x-2">
+          {/* Mobile close button */}
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="lg:hidden h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           )}
-        >
-          {direction === 'rtl' ? (
-            collapsed ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />
-          ) : (
-            collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />
-          )}
-        </Button>
+          {/* Desktop collapse toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setCollapsed(!collapsed)}
+            className={cn(
+              "hidden lg:flex h-8 w-8 p-0",
+              collapsed && "mx-auto"
+            )}
+          >
+            {direction === 'rtl' ? (
+              collapsed ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />
+            ) : (
+              collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Navigation Menu */}
@@ -106,6 +131,7 @@ const Sidebar = () => {
             <Link
               key={item.path}
               to={item.path}
+              onClick={handleLinkClick}
               className={cn(
                 "flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors",
                 direction === 'rtl' && "space-x-reverse",

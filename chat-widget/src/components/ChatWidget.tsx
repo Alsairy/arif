@@ -131,21 +131,21 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
       dir={getDirection()}
       style={{ fontFamily: language === 'ar' ? 'Arial, sans-serif' : 'inherit' }}
     >
-      <Card className={`w-80 h-96 shadow-2xl ${theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white'} ${isMinimized ? 'h-auto' : ''}`}>
-        <CardHeader className={`flex flex-row items-center justify-between p-4 ${theme === 'dark' ? 'bg-gray-800' : ''}`} style={{ backgroundColor: theme === 'light' ? primaryColor : undefined }}>
-          <div className="flex items-center space-x-2">
-            <MessageCircle className="h-5 w-5 text-white" />
-            <h3 className="text-white font-semibold text-sm">
+      <Card className={`w-80 sm:w-96 h-96 sm:h-[28rem] shadow-2xl ${theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white'} ${isMinimized ? 'h-auto' : ''} max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)]`}>
+        <CardHeader className={`flex flex-row items-center justify-between p-3 sm:p-4 ${theme === 'dark' ? 'bg-gray-800' : ''}`} style={{ backgroundColor: theme === 'light' ? primaryColor : undefined }}>
+          <div className="flex items-center space-x-2 min-w-0 flex-1">
+            <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white flex-shrink-0" />
+            <h3 className="text-white font-semibold text-xs sm:text-sm truncate">
               {t('chat.title')}
             </h3>
           </div>
           
-          <div className="flex items-center space-x-1">
-            <div className="flex items-center space-x-1 mr-2">
+          <div className="flex items-center space-x-1 flex-shrink-0">
+            <div className="hidden sm:flex items-center space-x-1 mr-2">
               {state.isConnected ? (
-                <Wifi className="h-4 w-4 text-green-400" />
+                <Wifi className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
               ) : (
-                <WifiOff className="h-4 w-4 text-red-400" />
+                <WifiOff className="h-3 w-3 sm:h-4 sm:w-4 text-red-400" />
               )}
               <span className="text-xs text-white opacity-75">
                 {state.isConnected ? t('status.online') : t('status.offline')}
@@ -195,7 +195,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
         </CardHeader>
         
         {!isMinimized && (
-          <CardContent className="p-0 flex flex-col h-80">
+          <CardContent className="p-0 flex flex-col h-80 sm:h-96">
             <div className="flex-1 overflow-hidden">
               <MessageList 
                 theme={theme}

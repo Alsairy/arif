@@ -10,15 +10,17 @@ import {
   BookOpen, 
   Settings, 
   LogOut,
-  BarChart3
+  BarChart3,
+  X
 } from 'lucide-react'
 
 interface SidebarProps {
   activeTab: string
   onTabChange: (tab: string) => void
+  onClose?: () => void
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, onClose }) => {
   const { t, direction } = useLanguage()
   const { logout } = useAuth()
   const { unreadCount } = useChat()
@@ -56,20 +58,40 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
     }
   ]
 
+  const handleTabChange = (tab: string) => {
+    onTabChange(tab)
+    if (onClose) {
+      onClose()
+    }
+  }
+
   return (
     <div 
       className="w-64 bg-white border-r border-gray-200 flex flex-col h-full"
       dir={direction}
     >
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <MessageSquare className="h-5 w-5 text-white" />
+      <div className="p-4 lg:p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <MessageSquare className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold text-gray-900">Arif Agent</h1>
+              <p className="text-sm text-gray-500">Live Support</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-semibold text-gray-900">Arif Agent</h1>
-            <p className="text-sm text-gray-500">Live Support</p>
-          </div>
+          {/* Mobile close button */}
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="lg:hidden h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -84,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                 <Button
                   variant={isActive ? "secondary" : "ghost"}
                   className={`w-full justify-start ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}
-                  onClick={() => onTabChange(item.id)}
+                  onClick={() => handleTabChange(item.id)}
                 >
                   <Icon className={`h-4 w-4 ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`} />
                   <span className="flex-1 text-left">{item.label}</span>
