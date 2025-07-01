@@ -27,7 +27,7 @@ const DashboardLayout = () => {
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden lg:ml-0">
         <Header onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 lg:p-6">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 lg:p-6 relative z-10">
           <Outlet />
         </main>
       </div>

@@ -67,7 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, onClose }) =>
 
   return (
     <div 
-      className="w-64 bg-white border-r border-gray-200 flex flex-col h-full"
+      className="w-64 bg-white border-r border-gray-200 flex flex-col h-full relative z-50"
       dir={direction}
     >
       <div className="p-4 lg:p-6 border-b border-gray-200">
@@ -87,7 +87,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, onClose }) =>
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="lg:hidden h-8 w-8 p-0"
+              className="lg:hidden h-8 w-8 p-0 relative z-10"
+              style={{ pointerEvents: 'auto' }}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -95,7 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, onClose }) =>
         </div>
       </div>
 
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 p-4 relative z-10">
         <ul className="space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon
@@ -105,8 +106,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, onClose }) =>
               <li key={item.id}>
                 <Button
                   variant={isActive ? "secondary" : "ghost"}
-                  className={`w-full justify-start ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}
+                  className={`w-full justify-start relative z-10 cursor-pointer ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}
                   onClick={() => handleTabChange(item.id)}
+                  style={{ pointerEvents: 'auto' }}
                 >
                   <Icon className={`h-4 w-4 ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`} />
                   <span className="flex-1 text-left">{item.label}</span>
@@ -122,11 +124,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, onClose }) =>
         </ul>
       </nav>
 
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 relative z-10">
         <Button
           variant="ghost"
-          className={`w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}
+          className={`w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 relative z-10 cursor-pointer ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}
           onClick={logout}
+          style={{ pointerEvents: 'auto' }}
         >
           <LogOut className={`h-4 w-4 ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`} />
           {t('nav.logout')}
