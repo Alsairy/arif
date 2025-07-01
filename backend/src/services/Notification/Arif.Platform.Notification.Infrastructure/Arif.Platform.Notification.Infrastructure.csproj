@@ -6,4 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.17" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Arif.Platform.Notification.Domain\Arif.Platform.Notification.Domain.csproj" />
+    <ProjectReference Include="..\..\..\shared\Arif.Platform.Shared.Common\Arif.Platform.Shared.Common.csproj" />
+    <ProjectReference Include="..\..\..\shared\Arif.Platform.Shared.Domain\Arif.Platform.Shared.Domain.csproj" />
+    <ProjectReference Include="..\..\..\shared\Arif.Platform.Shared.Infrastructure\Arif.Platform.Shared.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

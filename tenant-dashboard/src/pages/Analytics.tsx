@@ -4,15 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
-  BarChart3, 
-  TrendingUp, 
   Users, 
   MessageSquare, 
   Clock,
   Target,
   Download
 } from 'lucide-react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts'
 
 const Analytics = () => {
   const { t } = useLanguage()
@@ -34,7 +32,7 @@ const Analytics = () => {
     { value: 'faq', label: 'FAQ Bot' }
   ]
 
-  const [analyticsData, setAnalyticsData] = useState({
+  const [analyticsData] = useState({
     totalConversations: 2847,
     activeUsers: 1234,
     avgResponseTime: 1.2,

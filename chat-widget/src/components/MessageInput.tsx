@@ -3,13 +3,11 @@ import { useChat } from '@/contexts/ChatContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
+
 import { 
   Send, 
   Paperclip, 
-  Image as ImageIcon, 
-  FileText, 
-  X,
+
   Upload
 } from 'lucide-react'
 import { toast } from 'sonner'

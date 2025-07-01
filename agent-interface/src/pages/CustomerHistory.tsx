@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { 
   Search, 
-  User, 
   MessageSquare, 
   Clock, 
   Star,
@@ -49,7 +48,7 @@ interface Customer {
 }
 
 const CustomerHistory: React.FC = () => {
-  const { t, direction } = useLanguage()
+  const { direction } = useLanguage()
   const { user } = useAuth()
   const [customers, setCustomers] = useState<Customer[]>([])
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null)

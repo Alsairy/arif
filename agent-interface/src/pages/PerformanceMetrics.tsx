@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useAuth } from '@/contexts/AuthContext'
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -12,7 +12,6 @@ import {
   Clock, 
   MessageSquare, 
   Star,
-  Users,
   Target,
   Award,
   Calendar,
@@ -40,8 +39,7 @@ interface MetricCard {
 }
 
 const PerformanceMetrics: React.FC = () => {
-  const { t, direction } = useLanguage()
-  const { user } = useAuth()
+  const { direction } = useLanguage()
   const [timeRange, setTimeRange] = useState<string>('7d')
   const [performanceData, setPerformanceData] = useState<PerformanceData[]>([])
   const [metrics, setMetrics] = useState<MetricCard[]>([])

@@ -30,12 +30,12 @@ interface QueueItem {
 }
 
 const QueueManagement: React.FC = () => {
-  const { t, direction } = useLanguage()
+  const { direction } = useLanguage()
   const { user } = useAuth()
   const [queueItems, setQueueItems] = useState<QueueItem[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [priorityFilter, setPriorityFilter] = useState<string>('all')
-  const [sourceFilter, setSourceFilter] = useState<string>('all')
+  const [sourceFilter] = useState<string>('all')
   const [sortBy, setSortBy] = useState<string>('waitTime')
 
   useEffect(() => {

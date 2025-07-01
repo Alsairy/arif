@@ -6,17 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { 
-  MessageSquare, 
   Send, 
   Phone, 
   Video,
   MoreHorizontal,
-  Clock,
   User,
-  FileText,
   Paperclip
 } from 'lucide-react'
 
@@ -50,9 +47,9 @@ interface ActiveConversation {
 }
 
 const ActiveConversations: React.FC = () => {
-  const { t, direction } = useLanguage()
+  const { direction } = useLanguage()
   const { user } = useAuth()
-  const { activeChatSessions } = useChat()
+  const { } = useChat()
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null)
   const [conversations, setConversations] = useState<ActiveConversation[]>([])
   const [newMessage, setNewMessage] = useState('')

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -55,7 +55,7 @@ interface AppearanceSettings {
 }
 
 const AgentSettings: React.FC = () => {
-  const { t, direction, language, setLanguage } = useLanguage()
+  const { direction, language, setLanguage } = useLanguage()
   const { user } = useAuth()
   const [profile, setProfile] = useState<AgentProfile>({
     name: user?.name || 'Agent Name',
