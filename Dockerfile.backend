@@ -92,4 +92,5 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 
 # Set the entry point
 ARG SERVICE_DLL
+ENV SERVICE_DLL=${SERVICE_DLL}
 ENTRYPOINT ["sh", "-c", "dotnet ${SERVICE_DLL}"]
