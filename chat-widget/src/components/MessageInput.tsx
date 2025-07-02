@@ -122,7 +122,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ theme = 'light' }) => {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={t('chat.placeholder')}
-                disabled={!state.isConnected || isUploading}
+                disabled={isUploading}
                 maxLength={maxLength}
                 className={`${theme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : ''} ${direction === 'rtl' ? 'text-right' : 'text-left'}`}
                 dir={direction}
@@ -142,7 +142,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ theme = 'light' }) => {
             variant="ghost"
             size="sm"
             onClick={openFileDialog}
-            disabled={!state.isConnected || isUploading}
+            disabled={isUploading}
             className={`h-10 w-10 p-0 ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
           >
             {isUploading ? (
@@ -154,7 +154,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ theme = 'light' }) => {
           
           <Button
             onClick={handleSend}
-            disabled={!message.trim() || !state.isConnected || isUploading}
+            disabled={!message.trim() || isUploading}
             size="sm"
             className="h-10 w-10 p-0"
           >

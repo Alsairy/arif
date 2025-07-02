@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useTheme } from '@/components/theme-provider'
@@ -28,6 +29,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+  const navigate = useNavigate()
   const { user, logout } = useAuth()
   const { language, setLanguage, t, direction } = useLanguage()
   const { theme, setTheme } = useTheme()
@@ -62,7 +64,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
         <div className={`flex items-center space-x-2 lg:space-x-4 ${direction === 'rtl' ? 'space-x-reverse' : ''}`}>
           {/* Notifications */}
-          <Button variant="ghost" size="sm" className="relative">
+          <Button variant="ghost" size="sm" className="relative" onClick={() => navigate('/settings?tab=notifications')}>
             <Bell className="h-5 w-5" />
             <Badge 
               variant="destructive" 

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useChat } from '@/contexts/ChatContext'
@@ -27,6 +28,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+  const navigate = useNavigate()
   const { user, logout, updateStatus } = useAuth()
   const { t, language, setLanguage, direction } = useLanguage()
   const { unreadCount } = useChat()
@@ -82,6 +84,9 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             variant="ghost"
             size="sm"
             className="relative h-8 w-8 p-0"
+            onClick={() => {
+              navigate('/settings?tab=notifications')
+            }}
           >
             <Bell className="h-4 w-4" />
             {unreadCount > 0 && (

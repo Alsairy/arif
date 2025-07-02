@@ -39,7 +39,6 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
   enableSound = true,
   showBranding = true,
   customWelcomeMessage,
-  language: initialLanguage = 'en',
   onLanguageChange
 }) => {
   const { state, toggleChat, markAsRead, language, setLanguage } = useChat()
@@ -47,11 +46,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
   const [soundEnabled, setSoundEnabled] = useState(enableSound)
   const [isMinimized, setIsMinimized] = useState(false)
 
-  useEffect(() => {
-    if (initialLanguage !== language) {
-      setLanguage(initialLanguage)
-    }
-  }, [initialLanguage, language, setLanguage])
+
 
   useEffect(() => {
     if (onLanguageChange) {

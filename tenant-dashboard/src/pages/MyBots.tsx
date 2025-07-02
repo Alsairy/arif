@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -30,6 +31,7 @@ interface Bot {
 }
 
 const MyBots: React.FC = () => {
+  const navigate = useNavigate()
   const { language } = useLanguage()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -121,7 +123,10 @@ const MyBots: React.FC = () => {
             }
           </p>
         </div>
-        <Button className="flex items-center gap-2">
+        <Button 
+          className="flex items-center gap-2"
+          onClick={() => navigate('/dashboard/bot-builder')}
+        >
           <Plus className="h-4 w-4" />
           {language === 'ar' ? 'إنشاء روبوت جديد' : 'Create New Bot'}
         </Button>
@@ -304,7 +309,7 @@ const MyBots: React.FC = () => {
               : 'No bots match your search criteria'
             }
           </p>
-          <Button>
+          <Button onClick={() => navigate('/dashboard/bot-builder')}>
             <Plus className="h-4 w-4 mr-2" />
             {language === 'ar' ? 'إنشاء روبوت جديد' : 'Create New Bot'}
           </Button>

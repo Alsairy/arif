@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (storedToken) {
         try {
           axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
-          const response = await axios.get(`${API_BASE_URL}/auth/me`)
+          const response = await axios.get(`${API_BASE_URL}/api/authentication/me`)
           setUser(response.data)
           setToken(storedToken)
         } catch (error) {

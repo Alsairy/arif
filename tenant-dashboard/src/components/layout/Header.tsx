@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { Button } from '@/components/ui/button'
@@ -9,6 +10,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { language, setLanguage, direction, t } = useLanguage()
 
@@ -42,7 +44,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             <span className="hidden lg:inline">{language.toUpperCase()}</span>
           </Button>
           
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/settings?tab=notifications')}>
             <Bell className="h-4 w-4" />
           </Button>
           
