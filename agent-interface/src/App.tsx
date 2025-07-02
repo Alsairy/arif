@@ -11,6 +11,7 @@ import ActiveConversations from '@/pages/ActiveConversations'
 import CustomerHistory from '@/pages/CustomerHistory'
 import PerformanceMetrics from '@/pages/PerformanceMetrics'
 import AgentSettings from '@/pages/AgentSettings'
+import KnowledgeBase from '@/pages/KnowledgeBase'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -103,6 +104,16 @@ const AppContent: React.FC = () => {
             <ProtectedRoute>
               <DashboardLayout>
                 <AgentSettings />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/knowledge"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <KnowledgeBase />
               </DashboardLayout>
             </ProtectedRoute>
           }

@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useChat } from '@/contexts/ChatContext'
@@ -15,51 +16,31 @@ import {
 } from 'lucide-react'
 
 interface SidebarProps {
-  activeTab: string
-  onTabChange: (tab: string) => void
   onClose?: () => void
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { t, direction } = useLanguage()
   const { logout } = useAuth()
   const { unreadCount } = useChat()
+  const location = useLocation()
 
-  const menuItems = [
-    {
-      id: 'dashboard',
-      label: t('nav.dashboard'),
-      icon: BarChart3,
-      badge: null
-    },
-    {
-      id: 'chats',
-      label: t('nav.chats'),
-      icon: MessageSquare,
-      badge: unreadCount > 0 ? unreadCount : null
-    },
-    {
-      id: 'customers',
-      label: t('nav.customers'),
-      icon: Users,
-      badge: null
-    },
-    {
-      id: 'knowledge',
-      label: t('nav.knowledge'),
-      icon: BookOpen,
-      badge: null
-    },
-    {
-      id: 'settings',
-      label: t('nav.settings'),
-      icon: Settings,
-      badge: null
-    }
+  const navigation = [
+    { name: t('nav.dashboard'), href: '/dashboard', icon: BarChart3, badge: null },
+    { name: t('nav.chats'), href: '/chats', icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : null },
+    { name: t('nav.customers'), href: '/customers', icon: Users, badge: null },
+    { name: t('nav.knowledge'), href: '/knowledge', icon: BookOpen, badge: null },
+    { name: t('nav.settings'), href: '/settings', icon: Settings, badge: null }
   ]
 
-  const handleTabChange = (tab: string) => {
-    onTabChange(tab)
+  const isActive = (href: string) => {
+    if (href === '/dashboard') {
+      return location.pathname === '/dashboard'
+    }
+    return location.pathname.startsWith(href)
+  }
+
+  const handleLinkClick = () => {
     if (onClose) {
       onClose()
     }
@@ -98,26 +79,29 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, onClose }) =>
 
       <nav className="flex-1 p-4 relative z-10">
         <ul className="space-y-2">
-          {menuItems.map((item) => {
+          {navigation.map((item) => {
             const Icon = item.icon
-            const isActive = activeTab === item.id
             
             return (
-              <li key={item.id}>
-                <Button
-                  variant={isActive ? "secondary" : "ghost"}
-                  className={`w-full justify-start relative z-10 cursor-pointer ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}
-                  onClick={() => handleTabChange(item.id)}
+              <li key={item.name}>
+                <Link
+                  to={item.href}
+                  onClick={handleLinkClick}
+                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors relative z-10 cursor-pointer ${
+                    isActive(item.href)
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  } ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}
                   style={{ pointerEvents: 'auto' }}
                 >
                   <Icon className={`h-4 w-4 ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`} />
-                  <span className="flex-1 text-left">{item.label}</span>
+                  <span className="flex-1 text-left">{item.name}</span>
                   {item.badge && (
                     <Badge variant="destructive" className="ml-auto">
                       {item.badge > 99 ? '99+' : item.badge}
                     </Badge>
                   )}
-                </Button>
+                </Link>
               </li>
             )
           })}
