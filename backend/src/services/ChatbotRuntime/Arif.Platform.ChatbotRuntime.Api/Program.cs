@@ -58,9 +58,15 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddDbContext<ArifPlatformDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-        ?? "Server=(localdb)\\mssqllocaldb;Database=ArifPlatform;Trusted_Connection=true;MultipleActiveResultSets=true";
-    options.UseSqlServer(connectionString);
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        options.UseInMemoryDatabase("ArifPlatformChatbotRuntimeInMemory");
+    }
+    else
+    {
+        options.UseSqlServer(connectionString);
+    }
 });
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -116,6 +122,8 @@ builder.Services.AddScoped<IChatbotRuntimeService, ChatbotRuntimeService>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IChannelService, ChannelService>();
+builder.Services.AddScoped<IInputValidationService, InputValidationService>();
+builder.Services.AddScoped<ISecurityMonitoringService, SecurityMonitoringService>();
 
 builder.Services.AddHealthChecks();
 
@@ -145,7 +153,6 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseCors("ArifCorsPolicy");
 
 app.UseMiddleware<TenantResolutionMiddleware>();
-app.UseMiddleware<ZeroTrustMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

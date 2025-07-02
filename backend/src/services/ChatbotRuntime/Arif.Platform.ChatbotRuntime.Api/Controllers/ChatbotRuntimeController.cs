@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Arif.Platform.ChatbotRuntime.Domain.Interfaces;
 using Arif.Platform.ChatbotRuntime.Domain.DTOs;
 using Arif.Platform.Shared.Infrastructure.Services;
@@ -366,59 +367,59 @@ namespace Arif.Platform.ChatbotRuntime.Api.Controllers
                 version = "1.0.0"
             });
         }
-    }
-h
-    [HttpPost("chat/upload")]
-    [AllowAnonymous]
-    public async Task<IActionResult> UploadFileAsync(IFormFile file, [FromForm] string? sessionId = null, [FromForm] string? channelId = null)
-    {
-        try
+
+        [HttpPost("chat/upload")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UploadFileAsync(IFormFile file, [FromForm] string? sessionId = null, [FromForm] string? channelId = null)
         {
-            if (file == null || file.Length == 0)
+            try
             {
-                return BadRequest(new { error = "No file provided" });
+                if (file == null || file.Length == 0)
+                {
+                    return BadRequest(new { error = "No file provided" });
+                }
+
+                const long maxFileSize = 10 * 1024 * 1024;
+                if (file.Length > maxFileSize)
+                {
+                    return BadRequest(new { error = "File size exceeds 10MB limit" });
+                }
+
+                var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf", "text/plain", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
+                if (!allowedTypes.Contains(file.ContentType))
+                {
+                    return BadRequest(new { error = "File type not supported" });
+                }
+
+                var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                var uploadPath = Path.Combine("uploads", "chat", fileName);
+                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", uploadPath);
+
+                Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                var fileUrl = $"/uploads/chat/{fileName}";
+
+                _logger.LogInformation("File uploaded successfully: {FileName} for session {SessionId}", fileName, sessionId);
+
+                return Ok(new
+                {
+                    success = true,
+                    fileUrl = fileUrl,
+                    fileName = file.FileName,
+                    fileSize = file.Length,
+                    contentType = file.ContentType
+                });
             }
-
-            const long maxFileSize = 10 * 1024 * 1024;
-            if (file.Length > maxFileSize)
+            catch (Exception ex)
             {
-                return BadRequest(new { error = "File size exceeds 10MB limit" });
+                _logger.LogError(ex, "Error uploading file");
+                return StatusCode(500, new { error = "File upload failed" });
             }
-
-            var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf", "text/plain", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
-            if (!allowedTypes.Contains(file.ContentType))
-            {
-                return BadRequest(new { error = "File type not supported" });
-            }
-
-            var fileName = $"{Guid.NewGuid()}_{file.FileName}";
-            var uploadPath = Path.Combine("uploads", "chat", fileName);
-            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", uploadPath);
-
-            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
-
-            using (var stream = new FileStream(fullPath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            var fileUrl = $"/uploads/chat/{fileName}";
-
-            _logger.LogInformation("File uploaded successfully: {FileName} for session {SessionId}", fileName, sessionId);
-
-            return Ok(new
-            {
-                success = true,
-                fileUrl = fileUrl,
-                fileName = file.FileName,
-                fileSize = file.Length,
-                contentType = file.ContentType
-            });
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error uploading file");
-            return StatusCode(500, new { error = "File upload failed" });
-        }
-    }
+}
 }
