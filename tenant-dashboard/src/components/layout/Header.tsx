@@ -44,7 +44,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             <span className="hidden lg:inline">{language.toUpperCase()}</span>
           </Button>
           
-          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/settings?tab=notifications')}>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/settings?tab=notifications')}>
             <Bell className="h-4 w-4" />
           </Button>
           
