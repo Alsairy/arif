@@ -42,28 +42,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const API_BASE_URL = import.meta.env.VITE_AUTH_SERVICE_URL || 'http://localhost:5000'
 
   useEffect(() => {
-    if (API_BASE_URL.includes('@')) {
-      const urlParts = API_BASE_URL.split('@')
-      if (urlParts.length === 2) {
-        const credentials = urlParts[0].split('//')[1]
-        const baseUrl = `https://${urlParts[1]}`
-        
-        axios.defaults.baseURL = baseUrl
-        axios.defaults.auth = {
-          username: credentials.split(':')[0],
-          password: credentials.split(':')[1]
-        }
-      }
-    }
-  }, [API_BASE_URL])
-
-  useEffect(() => {
     const initAuth = async () => {
+      axios.defaults.baseURL = API_BASE_URL
+      
       const storedToken = localStorage.getItem('admin_token')
       if (storedToken) {
         try {
           axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
-          const response = await axios.get(`${API_BASE_URL}/api/authentication/me`)
+          const response = await axios.get('/authentication/me')
           setUser(response.data)
           setToken(storedToken)
         } catch (error) {
@@ -79,45 +65,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const requestConfig: any = {
+      const response = await axios.post('/authentication/login', {
+        email,
+        password
+      }, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
-      }
-
-      if (API_BASE_URL.includes('@')) {
-        const urlParts = API_BASE_URL.split('@')
-        if (urlParts.length === 2) {
-          const credentials = urlParts[0].split('//')[1]
-          const baseUrl = `https://${urlParts[1]}`
-          
-          requestConfig.auth = {
-            username: credentials.split(':')[0],
-            password: credentials.split(':')[1]
-          }
-          
-          const response = await axios.post(`${baseUrl}/api/authentication/login`, {
-            email,
-            password
-          }, requestConfig)
-
-          const { accessToken, user: userData } = response.data
-          
-          localStorage.setItem('admin_token', accessToken)
-          axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
-          
-          setToken(accessToken)
-          setUser(userData)
-          return
-        }
-      }
-
-      const response = await axios.post(`${API_BASE_URL}/api/authentication/login`, {
-        email,
-        password
-      }, requestConfig)
+      })
 
       const { accessToken, user: userData } = response.data
       
