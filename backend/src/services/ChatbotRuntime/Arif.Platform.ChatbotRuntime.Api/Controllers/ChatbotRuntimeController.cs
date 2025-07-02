@@ -45,7 +45,7 @@ namespace Arif.Platform.ChatbotRuntime.Api.Controllers
                     return BadRequest(new { error = "Message is required" });
                 }
 
-                _logger.LogInformation("Processing chat message for session {SessionId} in channel {ChannelId}", 
+                _logger.LogInformation("Processing chat message for session {SessionId} in channel {ChannelId}",
                     request.SessionId, request.ChannelId);
 
                 var response = await _chatbotRuntimeService.ProcessChatMessageAsync(request);
@@ -91,7 +91,7 @@ namespace Arif.Platform.ChatbotRuntime.Api.Controllers
                 _logger.LogInformation("Retrieving session {SessionId} for tenant {TenantId}", sessionId, tenantId);
 
                 var session = await _sessionService.GetSessionAsync(sessionId, tenantId.Value);
-                
+
                 if (session == null)
                 {
                     return NotFound(new { error = "Session not found" });
@@ -116,7 +116,7 @@ namespace Arif.Platform.ChatbotRuntime.Api.Controllers
                 _logger.LogInformation("Ending session {SessionId} for tenant {TenantId}", sessionId, tenantId);
 
                 var success = await _sessionService.EndSessionAsync(sessionId, tenantId.Value);
-                
+
                 if (!success)
                 {
                     return NotFound(new { error = "Session not found or already ended" });
@@ -172,11 +172,11 @@ namespace Arif.Platform.ChatbotRuntime.Api.Controllers
             {
                 var tenantId = _currentUserService.TenantId;
 
-                _logger.LogInformation("Retrieving conversation {ConversationId} for tenant {TenantId}", 
+                _logger.LogInformation("Retrieving conversation {ConversationId} for tenant {TenantId}",
                     conversationId, tenantId);
 
                 var conversation = await _conversationService.GetConversationAsync(conversationId, tenantId.Value);
-                
+
                 if (conversation == null)
                 {
                     return NotFound(new { error = "Conversation not found" });
@@ -256,7 +256,7 @@ namespace Arif.Platform.ChatbotRuntime.Api.Controllers
                 request.TenantId = tenantId.Value;
                 request.CreatedBy = userId.Value;
 
-                _logger.LogInformation("Creating channel {ChannelName} for tenant {TenantId}", 
+                _logger.LogInformation("Creating channel {ChannelName} for tenant {TenantId}",
                     request.Name, tenantId);
 
                 var channel = await _channelService.CreateChannelAsync(request);
@@ -279,7 +279,7 @@ namespace Arif.Platform.ChatbotRuntime.Api.Controllers
                 _logger.LogInformation("Retrieving channel {ChannelId} for tenant {TenantId}", channelId, tenantId);
 
                 var channel = await _channelService.GetChannelAsync(channelId, tenantId.Value);
-                
+
                 if (channel == null)
                 {
                     return NotFound(new { error = "Channel not found" });
@@ -314,7 +314,7 @@ namespace Arif.Platform.ChatbotRuntime.Api.Controllers
                 _logger.LogInformation("Updating channel {ChannelId} for tenant {TenantId}", channelId, tenantId);
 
                 var channel = await _channelService.UpdateChannelAsync(request);
-                
+
                 if (channel == null)
                 {
                     return NotFound(new { error = "Channel not found" });
@@ -339,7 +339,7 @@ namespace Arif.Platform.ChatbotRuntime.Api.Controllers
                 _logger.LogInformation("Deleting channel {ChannelId} for tenant {TenantId}", channelId, tenantId);
 
                 var success = await _channelService.DeleteChannelAsync(channelId, tenantId.Value);
-                
+
                 if (!success)
                 {
                     return NotFound(new { error = "Channel not found" });
@@ -365,6 +365,60 @@ namespace Arif.Platform.ChatbotRuntime.Api.Controllers
                 timestamp = DateTime.UtcNow,
                 version = "1.0.0"
             });
+        }
+    }
+h
+    [HttpPost("chat/upload")]
+    [AllowAnonymous]
+    public async Task<IActionResult> UploadFileAsync(IFormFile file, [FromForm] string? sessionId = null, [FromForm] string? channelId = null)
+    {
+        try
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest(new { error = "No file provided" });
+            }
+
+            const long maxFileSize = 10 * 1024 * 1024;
+            if (file.Length > maxFileSize)
+            {
+                return BadRequest(new { error = "File size exceeds 10MB limit" });
+            }
+
+            var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf", "text/plain", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
+            if (!allowedTypes.Contains(file.ContentType))
+            {
+                return BadRequest(new { error = "File type not supported" });
+            }
+
+            var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+            var uploadPath = Path.Combine("uploads", "chat", fileName);
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", uploadPath);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+
+            using (var stream = new FileStream(fullPath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var fileUrl = $"/uploads/chat/{fileName}";
+
+            _logger.LogInformation("File uploaded successfully: {FileName} for session {SessionId}", fileName, sessionId);
+
+            return Ok(new
+            {
+                success = true,
+                fileUrl = fileUrl,
+                fileName = file.FileName,
+                fileSize = file.Length,
+                contentType = file.ContentType
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error uploading file");
+            return StatusCode(500, new { error = "File upload failed" });
         }
     }
 }
