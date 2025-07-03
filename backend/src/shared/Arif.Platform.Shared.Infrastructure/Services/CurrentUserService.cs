@@ -29,6 +29,15 @@ public class CurrentUserService : ICurrentUserService
         }
     }
 
+    public Guid? TenantId
+    {
+        get
+        {
+            var tenantIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("tenantId");
+            return tenantIdClaim != null && Guid.TryParse(tenantIdClaim.Value, out var tenantId) ? tenantId : null;
+        }
+    }
+
     public bool IsAuthenticated
     {
         get

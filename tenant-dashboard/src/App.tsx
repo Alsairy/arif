@@ -6,6 +6,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import LoginPage from '@/pages/LoginPage'
 import DashboardHome from '@/pages/DashboardHome'
+import MyBots from '@/pages/MyBots'
 import BotBuilder from '@/pages/BotBuilder'
 import Analytics from '@/pages/Analytics'
 import Webhooks from '@/pages/Webhooks'
@@ -29,7 +30,7 @@ function App() {
                 }
               >
                 <Route index element={<DashboardHome />} />
-                <Route path="bots" element={<DashboardHome />} />
+                <Route path="bots" element={<MyBots />} />
                 <Route path="bot-builder" element={<BotBuilder />} />
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="webhooks" element={<Webhooks />} />

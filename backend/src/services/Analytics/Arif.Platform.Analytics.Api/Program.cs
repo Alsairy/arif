@@ -90,9 +90,16 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ArifCorsPolicy", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins(
+                "https://arif-code-review-app-xczsu670.devinapps.com", // Admin Dashboard
+                "https://arif-code-review-app-ddxl77iy.devinapps.com", // Tenant Dashboard
+                "https://arif-code-review-app-ec5kdlfl.devinapps.com", // Agent Interface
+                "https://arif-code-review-app-gzmr1uth.devinapps.com", // Chat Widget
+                "https://arif-codebase-checker-a0sau4n1.devinapps.com"  // Landing Page
+              )
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -109,7 +116,7 @@ builder.Services.AddScoped<IZeroTrustSecurityService, ZeroTrustSecurityService>(
 builder.Services.AddScoped<IAutoScalingService, AutoScalingService>();
 builder.Services.AddScoped<IObservabilityService, ObservabilityService>();
 builder.Services.AddScoped<IComplianceMonitoringService, ComplianceMonitoringService>();
-builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<Arif.Platform.Analytics.Domain.Interfaces.IDashboardService, Arif.Platform.Analytics.Infrastructure.Services.DashboardService>();
 
 builder.Services.AddHealthChecks();
 

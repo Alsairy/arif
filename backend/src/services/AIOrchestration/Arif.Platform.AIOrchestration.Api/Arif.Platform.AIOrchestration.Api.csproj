@@ -16,9 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\shared\Arif.Platform.Shared.Domain\Arif.Platform.Shared.Domain.csproj" />
-    <ProjectReference Include="..\..\shared\Arif.Platform.Shared.Infrastructure\Arif.Platform.Shared.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\shared\Arif.Platform.Shared.Common\Arif.Platform.Shared.Common.csproj" />
+    <ProjectReference Include="..\..\..\shared\Arif.Platform.Shared.Domain\Arif.Platform.Shared.Domain.csproj" />
+    <ProjectReference Include="..\..\..\shared\Arif.Platform.Shared.Infrastructure\Arif.Platform.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\shared\Arif.Platform.Shared.Common\Arif.Platform.Shared.Common.csproj" />
     <ProjectReference Include="..\Arif.Platform.AIOrchestration.Domain\Arif.Platform.AIOrchestration.Domain.csproj" />
     <ProjectReference Include="..\Arif.Platform.AIOrchestration.Infrastructure\Arif.Platform.AIOrchestration.Infrastructure.csproj" />
   </ItemGroup>

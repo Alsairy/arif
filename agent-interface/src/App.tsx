@@ -6,6 +6,12 @@ import { ChatProvider } from '@/contexts/ChatContext'
 import LoginPage from '@/pages/LoginPage'
 import Dashboard from '@/pages/Dashboard'
 import ChatManagement from '@/pages/ChatManagement'
+import QueueManagement from '@/pages/QueueManagement'
+import ActiveConversations from '@/pages/ActiveConversations'
+import CustomerHistory from '@/pages/CustomerHistory'
+import PerformanceMetrics from '@/pages/PerformanceMetrics'
+import AgentSettings from '@/pages/AgentSettings'
+import KnowledgeBase from '@/pages/KnowledgeBase'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -48,6 +54,66 @@ const AppContent: React.FC = () => {
             <ProtectedRoute>
               <DashboardLayout>
                 <ChatManagement />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/queue"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <QueueManagement />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/conversations"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <ActiveConversations />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/customers"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <CustomerHistory />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/performance"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <PerformanceMetrics />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <AgentSettings />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/knowledge"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <KnowledgeBase />
               </DashboardLayout>
             </ProtectedRoute>
           }

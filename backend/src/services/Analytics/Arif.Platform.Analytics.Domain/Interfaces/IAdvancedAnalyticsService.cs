@@ -15,4 +15,13 @@ public interface IAdvancedAnalyticsService
     Task<ConversationAnalytics> AnalyzeConversationPatternsAsync(DateTime startDate, DateTime endDate, Guid tenantId, CancellationToken cancellationToken = default);
     Task<UserBehaviorAnalytics> AnalyzeUserBehaviorAsync(DateTime startDate, DateTime endDate, Guid tenantId, CancellationToken cancellationToken = default);
     Task<PerformanceOptimizationSuggestions> GetOptimizationSuggestionsAsync(Guid tenantId, CancellationToken cancellationToken = default);
+
+    Task<object> GetConversationAnalyticsAsync(object request);
+    Task<object> GetUserEngagementMetricsAsync(object request);
+    Task<object> GetBotPerformanceTrackingAsync(object request);
+    Task<object> GetPredictiveInsightsAsync(object request);
+    Task<object> GetAnomalyDetectionAsync(object request);
+    Task<object> TrackEventAsync(object request);
+    Task<object> GetAnalyticsReportAsync(string reportId, Guid tenantId);
+    Task<object> GenerateCustomReportAsync(object request);
 }

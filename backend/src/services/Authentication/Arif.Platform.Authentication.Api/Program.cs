@@ -104,6 +104,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("ArifCorsPolicy", policy =>
     {
         policy.WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "http://localhost:3002",
+                "http://localhost:3003",
                 "https://arif-code-review-app-xczsu670.devinapps.com",
                 "https://arif-code-review-app-ddxl77iy.devinapps.com",
                 "https://arif-code-review-app-ec5kdlfl.devinapps.com",
@@ -229,11 +233,31 @@ using (var scope = app.Services.CreateScope())
     
     try
     {
-        context.Database.EnsureCreated();
+        logger.LogInformation("Starting database initialization and seeding...");
         
-        if (!context.Users.Any(u => u.Email == "admin@example.com"))
+        var created = context.Database.EnsureCreated();
+        if (created)
         {
-            var defaultTenant = context.Tenants.FirstOrDefault() ?? new Arif.Platform.Shared.Domain.Entities.Tenant
+            logger.LogInformation("Database created successfully.");
+        }
+        else
+        {
+            logger.LogInformation("Database already exists.");
+        }
+        
+        var existingAdmin = context.Users.FirstOrDefault(u => u.Email == "admin@example.com");
+        if (existingAdmin != null)
+        {
+            logger.LogInformation("Admin user already exists with email: admin@example.com");
+            return;
+        }
+        
+        logger.LogInformation("Creating default tenant and admin user...");
+        
+        var defaultTenant = context.Tenants.FirstOrDefault();
+        if (defaultTenant == null)
+        {
+            defaultTenant = new Arif.Platform.Shared.Domain.Entities.Tenant
             {
                 Id = Guid.NewGuid(),
                 Name = "Default Admin Tenant",
@@ -242,35 +266,55 @@ using (var scope = app.Services.CreateScope())
                 UpdatedAt = DateTime.UtcNow
             };
             
-            if (context.Tenants.FirstOrDefault() == null)
-            {
-                context.Tenants.Add(defaultTenant);
-                context.SaveChanges();
-            }
-
-            var adminUser = new Arif.Platform.Shared.Domain.Entities.User
-            {
-                Id = Guid.NewGuid(),
-                Email = "admin@example.com",
-                Username = "admin",
-                FirstName = "Admin",
-                LastName = "User",
-                PasswordHash = passwordHasher.HashPassword("password"),
-                IsActive = true,
-                EmailConfirmed = true,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                TenantId = defaultTenant.Id
-            };
-            
-            context.Users.Add(adminUser);
+            context.Tenants.Add(defaultTenant);
             context.SaveChanges();
-            logger.LogInformation("Admin user created successfully with email: admin@example.com and TenantId: {TenantId}", defaultTenant.Id);
+            logger.LogInformation("Default tenant created with ID: {TenantId}", defaultTenant.Id);
+        }
+        else
+        {
+            logger.LogInformation("Using existing tenant with ID: {TenantId}", defaultTenant.Id);
+        }
+
+        var adminPassword = "Admin123!@#";
+        var adminUser = new Arif.Platform.Shared.Domain.Entities.User
+        {
+            Id = Guid.NewGuid(),
+            Email = "admin@example.com",
+            Username = "admin",
+            FirstName = "Admin",
+            LastName = "User",
+            PasswordHash = passwordHasher.HashPassword(adminPassword),
+            IsActive = true,
+            EmailConfirmed = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            TenantId = defaultTenant.Id
+        };
+        
+        context.Users.Add(adminUser);
+        var saveResult = context.SaveChanges();
+        
+        if (saveResult > 0)
+        {
+            logger.LogInformation("Admin user created successfully!");
+            logger.LogInformation("Login credentials - Email: admin@example.com, Password: {Password}", adminPassword);
+            logger.LogInformation("Admin user ID: {UserId}, Tenant ID: {TenantId}", adminUser.Id, defaultTenant.Id);
+        }
+        else
+        {
+            logger.LogWarning("Failed to save admin user to database.");
         }
     }
     catch (Exception ex)
     {
-        logger.LogWarning(ex, "Could not ensure database creation or seeding. This is expected in production environments.");
+        logger.LogError(ex, "Error during database initialization and seeding: {Message}", ex.Message);
+        
+        if (ex.InnerException != null)
+        {
+            logger.LogError("Inner exception: {InnerMessage}", ex.InnerException.Message);
+        }
+        
+        logger.LogWarning("Database seeding failed, but application will continue. Manual database setup may be required.");
     }
 }
 

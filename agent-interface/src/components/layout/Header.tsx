@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useChat } from '@/contexts/ChatContext'
@@ -18,10 +19,16 @@ import {
   Globe, 
   Settings, 
   LogOut,
-  Circle
+  Circle,
+  Menu
 } from 'lucide-react'
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  onMenuClick?: () => void
+}
+
+const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+  const navigate = useNavigate()
   const { user, logout, updateStatus } = useAuth()
   const { t, language, setLanguage, direction } = useLanguage()
   const { unreadCount } = useChat()
@@ -41,15 +48,26 @@ const Header: React.FC = () => {
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4" dir={direction}>
+    <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4" dir={direction}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <h1 className="text-xl font-semibold text-gray-900">
+          {/* Mobile menu button */}
+          {onMenuClick && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onMenuClick}
+              className="lg:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
+          <h1 className="text-lg lg:text-xl font-semibold text-gray-900">
             {t('dashboard.title')}
           </h1>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 lg:space-x-4">
           {/* Language Toggle */}
           <Button
             variant="ghost"
@@ -58,6 +76,7 @@ const Header: React.FC = () => {
             className="h-8 w-8 p-0"
           >
             <Globe className="h-4 w-4" />
+            <span className="sr-only">{language.toUpperCase()}</span>
           </Button>
 
           {/* Notifications */}
@@ -65,6 +84,9 @@ const Header: React.FC = () => {
             variant="ghost"
             size="sm"
             className="relative h-8 w-8 p-0"
+            onClick={() => {
+              navigate('/settings?tab=notifications')
+            }}
           >
             <Bell className="h-4 w-4" />
             {unreadCount > 0 && (

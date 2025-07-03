@@ -1,11 +1,13 @@
+import { useNavigate } from 'react-router-dom'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Bot, MessageSquare, BarChart3, Users, TrendingUp, Clock } from 'lucide-react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts'
+import { Bot, MessageSquare, Users, TrendingUp, Clock } from 'lucide-react'
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts'
 
 const DashboardHome = () => {
+  const navigate = useNavigate()
   const { t } = useLanguage()
   const { user } = useAuth()
 
@@ -67,7 +69,7 @@ const DashboardHome = () => {
             Welcome back, {user?.name}
           </p>
         </div>
-        <Button>
+        <Button onClick={() => navigate('/dashboard/bot-builder')}>
           <Bot className="h-4 w-4 mr-2" />
           {t('bot.create')}
         </Button>

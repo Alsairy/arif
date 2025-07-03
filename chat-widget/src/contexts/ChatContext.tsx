@@ -282,9 +282,11 @@ export const ChatProvider = ({
     formData.append('user_id', state.userId || 'anonymous')
 
     try {
-      const response = await fetch(`${apiUrl}/chat/upload`, {
+      const chatRuntimeUrl = (import.meta as any).env?.VITE_CHATBOT_RUNTIME_SERVICE_URL || apiUrl
+      const response = await fetch(`${chatRuntimeUrl}/chat/upload`, {
         method: 'POST',
-        body: formData
+        body: formData,
+        credentials: 'include'
       })
 
       if (!response.ok) {

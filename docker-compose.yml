@@ -14,7 +14,7 @@ services:
     volumes:
       - sqlserver_data:/var/opt/mssql
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'ArifPlatform2024!' -Q 'SELECT 1'"]
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'ArifPlatform2024!' -Q 'SELECT 1'"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -58,8 +58,6 @@ services:
       - JWT__Issuer=ArifPlatform
       - JWT__Audience=ArifPlatformUsers
     depends_on:
-      sqlserver:
-        condition: service_healthy
       redis:
         condition: service_healthy
     networks:
@@ -80,14 +78,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5000
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ArifPlatform;User Id=sa;Password=ArifPlatform2024!;TrustServerCertificate=true;
+      # - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ArifPlatform;User Id=sa;Password=ArifPlatform2024!;TrustServerCertificate=true;
       - Redis__ConnectionString=redis:6379
       - JWT__SecretKey=your-super-secret-jwt-key-change-in-production-min-32-chars
       - JWT__Issuer=ArifPlatform
       - JWT__Audience=ArifPlatformUsers
     depends_on:
-      sqlserver:
-        condition: service_healthy
       redis:
         condition: service_healthy
     networks:

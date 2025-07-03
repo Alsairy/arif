@@ -9,16 +9,11 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
 import { 
-  Settings as SettingsIcon, 
   User, 
   Shield, 
-  Globe, 
   Bell,
   Key,
-  Database,
-  Palette,
   Save,
   Eye,
   EyeOff
@@ -254,7 +249,7 @@ const Settings = () => {
                 <div className="space-y-2">
                   <Label htmlFor="language">Preferred Language</Label>
                   <Select value={profile.language} onValueChange={(value) => {
-                    setProfile({...profile, language: value})
+                    setProfile({...profile, language: value as 'en' | 'ar'})
                     setLanguage(value as 'en' | 'ar')
                   }}>
                     <SelectTrigger>

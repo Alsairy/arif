@@ -43,11 +43,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const initAuth = async () => {
+      axios.defaults.baseURL = API_BASE_URL
+      
       const storedToken = localStorage.getItem('admin_token')
       if (storedToken) {
         try {
           axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
-          const response = await axios.get(`${API_BASE_URL}/auth/me`)
+          const response = await axios.get('/authentication/me')
           setUser(response.data)
           setToken(storedToken)
         } catch (error) {
@@ -63,7 +65,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/authentication/login`, {
+      const response = await axios.post('/authentication/login', {
         email,
         password
       }, {
