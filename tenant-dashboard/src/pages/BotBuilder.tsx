@@ -263,7 +263,8 @@ const BotBuilder = () => {
     setSelectedNode(id)
   }, [])
 
-  const backend = HTML5Backend
+  const isMobile = window.innerWidth < 768
+  const backend = isMobile ? TouchBackend : HTML5Backend
 
   return (
     <DndProvider backend={backend}>
